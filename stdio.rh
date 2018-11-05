@@ -1,0 +1,301 @@
+/* oregengo-Rコンパイラ標準入出力ライブラリ for Linux x64 */
+
+ const EOF      255         /* ファイルの終わりをあらわす文字コード */
+ const ERROR    -1          /* エラーが発生したことをあらわす */
+ const NULL     0           /* ヌルポインタ */
+ const SPACE    32          /* 空白文字 */
+ const CR       13          /* キャリッジリターンコード */
+ const LF       10          /* ラインフィードコード */
+ const PLUS     43          /* プラス記号の文字コード */
+ const MINUS    45          /* マイナス記号の文字コード */
+ const ESC      27          /* ESCキーの文字コード */
+ const NaN      0x80000000  /* ゼロ除算が発生したことをあらわす */
+
+ /* 作業変数 */
+ char  __fbuf$(512)  /* ファイル読み書き用のバッファ */
+ char  __sign$(1),__nbuf$(64)
+ count __p0#
+ long   __p1#,__p2#,__p3#,__p4#,__p5#,__p6#,__p7#
+ long __t#,read_p# // data文へのポインタ
+
+/* プログラム開始位置 */
+_start:
+/ call main/
+/ rax=60/
+/ syscall/
+/ ret/
+
+
+/* コンソールからから一文字読み込む */
+getchar:
+ 0,
+
+
+/* ファイルから一文字読み込む */
+getc:
+  __t#=
+  0, __fbuf$=
+  1, &__fbuf, __t#, _read
+  __fbuf$, return
+
+
+/* ファイルから読み込む( size, buf, hFile, _read ) */
+_read:
+/ rax=0/
+/ syscall/
+/ rdi=rax/
+/ ret/
+
+
+/* コンソールへ一文字出力する */
+putchar:
+ 1,
+
+
+/* ファイルへ一文字書き込む */
+putc:
+  __t#= pop __fbuf$=
+  0, __fbuf$(1)=
+  1, &__fbuf, __t#, _write
+  return
+
+
+/* ファイルへ書き込む( size, buf, hFile, _write ) */
+_write:
+/ rax=1/
+/ syscall/
+/ rdi=rax/
+/ ret/
+
+
+// 書き込みモードでファイルを開く
+wopen:
+/ rsi=577/
+/ rdx=438/
+/ jmp open/
+
+
+// 読み出しモードでファイルを開く
+ropen:
+/rsi=0/
+
+
+// ファイルを開く
+open:
+/ rax=2/
+/ syscall/
+/ rdi=rax/
+/ ret/
+ 
+ 
+/* ファイルを閉じる */
+wclose:
+rclose:
+close:
+/ rax=1/
+/ syscall/
+/ rdi=rax/
+/ ret/
+ 
+/* 文字列を表示する */
+prints:
+ 1,
+
+
+/* 文字列をファイルへ出力する */
+fprints:
+ __p7#= swap __p6#=
+ __fprints1:
+  if (__p6)$=NULL then NULL, end
+  (__p6)$, __p7#, putc __p5#=
+  if __p5#=ERROR then ERROR, end
+  __p6#, 1, + __p6#=
+ goto __fprints1
+
+
+/* 数値を表示する */
+printd:
+ 1,
+
+
+/* 数値をファイルに出力する */
+fprintd:
+ __p7#= swap dec __p7#, fprints
+ end
+
+
+/* 改行する */
+nl:
+ 1,
+
+
+/* 改行コードをファイルに出力する */
+fnl:
+ __p7#=
+ LF, __p7#, putc
+ end
+
+
+/* コンソールから文字列を入力する */
+inputs:
+ 0,
+
+
+/* ファイルから文字列を入力する */
+finputs:
+ __p7#= swap __p6#=
+ __finputs1:
+  __p7#, getc __p5$=
+  if __p5$=LF  goto __finputs2
+  if __p5$=EOF goto __finputs2
+  __p5$, (__p6)$=
+  __p6#, 1, + __p6#=
+ goto __finputs1
+ __finputs2:
+ NULL,  (__p6)$=
+ __p5$, end
+
+
+/* 文字列を比較する */
+strcmp:
+ __p2#= swap __p1#=
+ __strcmp1:
+  if (__p1)$<>(__p2)$ then 1, end
+  if (__p1)$=NULL then 0, end
+  __p1#, 1, + __p1#=
+  __p2#, 1, + __p2#=
+ goto __strcmp1
+
+
+/* 文字列をコピーする */
+strcpy:
+ __p2#= swap __p1#=
+ __strcpy1:
+  (__p1)$, (__p2)$= __p3#=
+  __p1#, 1, + __p1#=
+  __p2#, 1, + __p2#=
+ if __p3#<>NULL goto __strcpy1
+ end
+
+
+/* 文字列を連結する */
+strcat:
+ __p2#= swap __p1#=
+__strcat1:
+ if (__p2)$<>NULL then __p2#, 1, + __p2#= goto__strcat1
+__strcat2:
+ (__p1)$, (__p2)$= __p3#=
+ __p1#, 1, + __p1#=
+ __p2#, 1, + __p2#=
+ if __p3#<>NULL goto __strcat2
+ end
+
+
+/* 文字列を検索する */
+strstr:
+ __p2#= swap __p1#=
+__strstr1:
+ if (__p1)$=NULL then NULL, end
+ __p1#, __p3#=
+ __p2#, __p4#=
+__strstr2:
+ if (__p3)$<>(__p4)$ then __p1#, 1, + __p1#= goto__strstr1
+ __p3#, 1, + __p3#=
+ __p4#, 1, + __p4#=
+ if (__p4)$<>NULL goto __strstr2
+ __p1#, end
+
+
+/* 文字列の長さを得る */
+strlen:
+ __p1!=
+ 0, __p2#=
+__strlen1:
+ if (__p1)$=NULL then __p2#, end
+ __p1#, 1, + __p1#=
+ __p2#, 1, + __p2#=
+ goto __strlen1
+
+
+/* 文字列を数値に変換する(基数指定あり) */
+atoi:
+ __p2#= swap __p1#=
+ 1, __p3#=   0, __p4#=
+ if (__p1)$=PLUS  then __p1#, 1, + __p1#=
+ if (__p1)$=MINUS then __p1#, 1, + __p1#= -1, __p3#=
+__atoi1:
+ 0, __p5#=
+__atoi2:
+ if __p5#>=__p2# then __p3#, __p4#, * end
+ if "0123456789abcdef"$(__p5#)<>(__p1)$ then __p5#, 1, + __p5#= goto__atoi2
+ __p4#, __p2#, umul __p5#, + __p4#=
+ __p1#, 1, + __p1#=
+ goto __atoi1
+
+
+/* 数値を文字列に変換する(基数指定あり) */
+itoa:
+  __p2#= swap __p1#=
+  if __p1#=0 then "0", __nbuf, strcpy __nbuf, end
+  __nbuf, __p3#=
+  1,      __p4#=
+  __p1#,  __p5#=
+__itoa1:
+ if __p5#<__p2# goto __itoa2
+  __p5#, __p2#, udiv __p5#=
+  __p4#, __p2#, umul __p4#=
+  goto __itoa1
+__itoa2:
+  __p1#, __p4#, udiv __p5#=
+  __p4#, __p5#, umul __p1#, swap - __p1#=
+  "0123456789abcdef"$(__p5#),  (__p3)$=
+  __p3#, 1, + __p3#=
+  __p4#, __p2#, udiv __p4#=
+  if __p4#<>0 goto __itoa2
+ NULL, (__p3)$=
+ __nbuf, end
+
+
+/* 数値を2進文字列に変換する */
+bin:
+ 2, itoa end
+
+
+/* 数値を8進文字列に変換する */
+oct:
+ 8, itoa end
+
+
+/* 数値を10進文字列に変換する */
+dec:
+ __p1#=
+ if __p1#>=0 then __p1#, 10, itoa end
+ __p1#,  neg 10, itoa
+ MINUS,  __sign$=
+ __sign, end
+
+
+/* 数値を16進文字列に変換する */
+hex:
+ 16, itoa end
+
+
+/* read文の読み込み位置を設定する */
+restore:
+ read_p#=
+ end
+
+
+/* data文で与えられたデータを読み込む */
+read:
+ read_p#, 8, + read_p#=
+ (read_p)#(-1), end
+
+
+/* 数値の絶対値を求める */
+abs:
+  __p1#=
+  if __p1#>=0 then __p1#, end
+  0, __p1#, - end
+
+
