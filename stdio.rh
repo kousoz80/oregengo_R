@@ -9,7 +9,8 @@
  const PLUS     43          /* プラス記号の文字コード */
  const MINUS    45          /* マイナス記号の文字コード */
  const ESC      27          /* ESCキーの文字コード */
- const NaN      0x80000000  /* ゼロ除算が発生したことをあらわす */
+ const NaN      0x8000000000000000  /* ゼロ除算が発生したことをあらわす */
+ const STACK_SIZE 1000
 
  /* 作業変数 */
  char  __fbuf$(512)  /* ファイル読み書き用のバッファ */
@@ -17,10 +18,13 @@
  count __p0#
  long   __p1#,__p2#,__p3#,__p4#,__p5#,__p6#,__p7#
  long __t#,read_p# // data文へのポインタ
+ long  __stack#(STACK_SIZE)
+ long  __stack_top#,__stack_p#
 
 /* プログラム開始位置 */
 _start:
-/ call main/
+  __stack_top, __stack_p#=
+  main
 / rax=60/
 / syscall/
 / ret/
@@ -44,7 +48,7 @@ _read:
 / rax=0/
 / syscall/
 / rdi=rax/
-/ ret/
+  end
 
 
 /* コンソールへ一文字出力する */
@@ -65,7 +69,7 @@ _write:
 / rax=1/
 / syscall/
 / rdi=rax/
-/ ret/
+  end
 
 
 // 書き込みモードでファイルを開く
@@ -85,7 +89,7 @@ open:
 / rax=2/
 / syscall/
 / rdi=rax/
-/ ret/
+  end
  
  
 /* ファイルを閉じる */
@@ -95,7 +99,7 @@ close:
 / rax=1/
 / syscall/
 / rdi=rax/
-/ ret/
+  end
  
 /* 文字列を表示する */
 prints:
