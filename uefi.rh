@@ -289,11 +289,11 @@ _read:
 
 // r13="_read"/ 
 // r14=rax/
-/ print_status
+// print_status
 
 / rax=__fbuf_length/
 / rdi=(rax)/
- end
+  end
 
 
 // コンソールへ1文字出力する
@@ -385,6 +385,8 @@ open:
 / rax=__dir_open/
 / rax=(rax)/
 / call (rax)/
+/ rax&rax/
+/ jnz open_error/
 
 // r13="dir_open"/ 
 // r14=rax/
@@ -417,6 +419,8 @@ open:
 / rax=__file_open/
 / rax=(rax)/
 / call (rax)/
+/ rax&rax/
+/ jnz open_error/
 
 // r13="file open"/ 
 // r14=rax/
@@ -428,8 +432,14 @@ open:
 
 / rax=0x100/
 / rsp+=rax/
- end 
+  0,  end 
 
+// エラー終了
+open_error:
+/ rax=0x100/
+/ rsp+=rax/
+  -1, end
+ 
  
 /* ファイルを閉じる */
 rclose:
@@ -542,6 +552,8 @@ dopen:
 / rax=__dir_open/
 / rax=(rax)/
 / call (rax)/
+/ rax&rax/
+/ jnz dopen_error/
 
 // r13="dir_open"/ 
 // r14=rax/
@@ -551,8 +563,12 @@ dopen:
 // rcx=__dir_fp/
 // r14=(rcx)/
 // dump
- end 
+   0, end 
 
+// エラー終了
+dopen_error:
+   -1, end 
+ 
  
 /* ディレクトリを閉じる */
 dclose:
