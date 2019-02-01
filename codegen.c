@@ -1,3 +1,4 @@
+// oregengo-R コードジェネレータ定義データ
 char* codegen[] = {
  "/\\/", "\\1\n",
  " \\:", "\\1:\n",
@@ -26,10 +27,11 @@ char* codegen[] = {
  " getchar$,", " call getchar\n",
  " inkey$,", " call inkey\n",
  " \\(rip),", " rdx=rsi\n rsi=rdi\n rdi=&\\1(rip)\n",
- " end", " rax=__stack_p\n r15=(rax)\n r15++\n r15++\n r15++\n r15++\n r15++\n r15++\n r15++\n r15++\n (rax)=r15\n rax=r15\n rax=-8(rax)\n jmp (rax)\n",
- " return", " rax=__stack_p\n r15=(rax)\n r15++\n r15++\n r15++\n r15++\n r15++\n r15++\n r15++\n r15++\n (rax)=r15\n rax=r15\n rax=-8(rax)\n jmp (rax)\n",
+ " end", " r14=1\n rax=__critical\n (rax)=r14\n rax=__stack_p\n r15=(rax)\n r15++\n r15++\n r15++\n r15++\n r15++\n r15++\n r15++\n r15++\n (rax)=r15\n r14=0\n rax=__critical\n (rax)=r14\n rax=r15\n rax=-8(rax)\n jmp (rax)\n",
+ " return", " r14=1\n rax=__critical\n (rax)=r14\n rax=__stack_p\n r15=(rax)\n r15++\n r15++\n r15++\n r15++\n r15++\n r15++\n r15++\n r15++\n (rax)=r15\n r14=0\n rax=__critical\n (rax)=r14\n rax=r15\n rax=-8(rax)\n jmp (rax)\n",
  " jmp@", " jmp (rdi)\n",
- " call@", " call (rdi)\n",
+ " call@", " r14=1\n rax=__critical\n (rax)=r14\n rax=__stack_p\n r15=(rax)\n r15--\n r15--\n r15--\n r15--\n r15--\n r15--\n r15--\n r15--\n (rax)=r15\n r14=0\n rax=__critical\n (rax)=r14\n rax=r15\n r15=$+15\n (rax)=r15\n jmp (rdi)\n",
+ " .data", " align 8\n",
  " (\\)#(\\#),", " rdx=rsi\n rsi=rdi\n rcx=&\\2\n rax=(rcx)\n rax+=rax\n rax+=rax\n rax+=rax\n rcx=&\\1\n rcx=(rcx)\n rcx+=rax\n rdi=(rcx)\n",
  " \\#(\\#),", " rdx=rsi\n rsi=rdi\n rcx=&\\2\n rax=(rcx)\n rax+=rax\n rax+=rax\n rax+=rax\n rcx=&\\1\n rcx+=rax\n rdi=(rcx)\n",
  " (\\)!(\\#),", " rdx=rsi\n rsi=rdi\n rcx=&\\2\n rax=(rcx)\n rax+=rax\n rax+=rax\n rcx=&\\1\n rcx=(rcx)\n rcx+=rax\n eax=(rcx)\n ext eax\n rdi=rax\n",
@@ -70,7 +72,7 @@ char* codegen[] = {
  " \\%--", " rcx=&\\1\n ax=(rcx)\n ax--\n (rcx)=ax\n",
  " \\$++", " rcx=&\\1\n al=(rcx)\n al++\n (rcx)=al\n",
  " \\$--", " rcx=&\\1\n al=(rcx)\n al--\n (rcx)=al\n",
- " (\\)#,"," rdx=rsi\n rsi=rdi\n rax=&\\1\n rax=(rax)\n rdi=(rax)\n",
+ " (\\)#,", " rdx=rsi\n rsi=rdi\n rax=&\\1\n rax=(rax)\n rdi=(rax)\n",
  " (\\)#=", " rax=&\\1\n rax=(rax)\n (rax)=rdi\n",
  " \\#,", " rdx=rsi\n rsi=rdi\n rax=&\\1\n rdi=(rax)\n",
  " \\#=", " rax=&\\1\n (rax)=rdi\n",
@@ -88,7 +90,8 @@ char* codegen[] = {
  " \\$=", " rax=&\\1\n rcx=rdi\n (rax)=cl\n",
  " \\,", " rdx=rsi\n rsi=rdi\n rdi=\\1\n",
  " data\\", " long \\1\n",
- " @\\", " rax=__stack_p\n r15=(rax)\n r15--\n r15--\n r15--\n r15--\n r15--\n r15--\n r15--\n r15--\n (rax)=r15\n rax=r15\n r15=$+23\n (rax)=r15\n rax=\\1\n jmp (rax)\n",
- " \\", " rax=__stack_p\n r15=(rax)\n r15--\n r15--\n r15--\n r15--\n r15--\n r15--\n r15--\n r15--\n (rax)=r15\n rax=r15\n r15=$+18\n (rax)=r15\n jmp \\1\n",
+ " @\\(\\)", " r13=\\2\n r14=1\n rax=__critical\n (rax)=r14\n rax=__stack_p\n r15=(rax)\n r15--\n r15--\n r15--\n r15--\n r15--\n r15--\n r15--\n r15--\n (rax)=r15\n r14=0\n rax=__critical\n (rax)=r14\n rax=r15\n r15=$+28\n (rax)=r15\n rax=\\1\n rax=(rax)\n jmp (rax)\n",
+ " @\\", " r14=1\n rax=__critical\n (rax)=r14\n rax=__stack_p\n r15=(rax)\n r15--\n r15--\n r15--\n r15--\n r15--\n r15--\n r15--\n r15--\n (rax)=r15\n r14=0\n rax=__critical\n (rax)=r14\n rax=r15\n r15=$+28\n (rax)=r15\n rax=\\1\n rax=(rax)\n jmp (rax)\n",
+ " \\", " r14=1\n rax=__critical\n (rax)=r14\n rax=__stack_p\n r15=(rax)\n r15--\n r15--\n r15--\n r15--\n r15--\n r15--\n r15--\n r15--\n (rax)=r15\n r14=0\n rax=__critical\n (rax)=r14\n rax=r15\n r15=$+18\n (rax)=r15\n jmp \\1\n",
 NULL
 };

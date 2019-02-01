@@ -274,6 +274,13 @@ void strProcess(){
         fprintf( hStrFile, "  byte %d\n", c );
       }
       fprintf( hStrFile, "  byte 0\n" );
+      if( c == EOF ) break;
+    }
+    else if( c == (int)'\'' ){
+      if( ( c = getc( hInFile  ) ) == EOF ) break;
+      fprintf( hOutFile, "%d", c );
+      while( ( c = getc( hInFile  ) ) != '\'' && c != EOF ) {}
+      if( c == EOF ) break;
     }
     else  putc( c, hOutFile );
   }

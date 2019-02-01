@@ -20,10 +20,12 @@
  long __t#,read_p# // data文へのポインタ
  long  __stack#(STACK_SIZE)
  long  __stack_top#,__stack_p#
+ long  __critical#
 
 /* プログラム開始位置 */
 _start:
   __stack_top, __stack_p#=
+  0, __critical#=
   main
 / rax=60/
 / syscall/

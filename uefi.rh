@@ -53,7 +53,7 @@
  // リターンスタック
  long  __stack#(STACK_SIZE)
  long  __stack_top#,__stack_p#
-
+ long __critical#
 
 /* プログラム開始位置 */
 _start:
@@ -120,8 +120,10 @@ _start:
 / rax=__set_wdt/
 / call (rax)/
 
+  0, __critical#=
+
   // ボリュームを開く
-   vol_open __p1#=
+  vol_open __p1#=
   if __p1#<>0 then "can't open volume.", prints nl goto__start1
 
 // メイン関数を呼び出す
