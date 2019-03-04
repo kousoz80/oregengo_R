@@ -205,6 +205,7 @@ char*  pass3[] = {
 /* プロトタイプ宣言  */
 void catFile( char* fname );
 void strProcess();
+void compile_s();
 void compile( int pass );
 
 //変数宣言
@@ -252,10 +253,16 @@ int main( int argc, char* argv[] ){
 
   /* コンパイル開始 */
   strProcess();  // 文字列の処理
+  Tmp     = OutFile;
+  OutFile = InFile;
+  InFile  = Tmp;
+
+  compile_s();   // struct/enum構文の処理
   Tmp     = InFile;
   InFile  = OutFile;
   OutFile = VarFile;
   VarFile = Tmp;
+
   compile( 0 );   /* 宣言文の処理 */
   Tmp     = OutFile;
   OutFile = VarFile;
@@ -338,9 +345,105 @@ void strProcess(){
 }
 
 
+// struct, enum構文の処理関数
+void compile_s(){
+  int mode=0; // 0:通常, 1:struct文 2:enum文
+  char *s, *t, buf[1024], sname[512];
+  int i, offset;
+  
+  if( ( hInFile  = fopen( InFile,  "r" ) ) == NULL ){
+    printf("struct/enum文の処理中にエラーが発生しました\n" );
+    return;
+  }
+  if( ( hOutFile =  fopen( OutFile, "w" ) ) == NULL ){
+    close( hInFile );
+    printf("struct/enum文の処理中にエラーが発生しました\n" );
+    return;
+  }
+
+  while( fgets(buf, 1024, hInFile ) != NULL ){
+
+    // 不要なスペースをすてる
+    for( i = strlen( buf ) - 1; i >= 0 && (buf[ i ] == ' ' || buf[ i ] == '\n'); i-- ) ;
+    buf[ i + 1 ] = '\0';
+
+    // コメントをすてる
+    if( ( s = strstr( buf, Comment1 ) ) != NULL ) *s = '\0';
+    if( ( s = strstr( buf, Comment2 ) ) != NULL ) *s = '\0';
+
+    // 通常文の場合
+    if( mode == 0 ){
+      for( s = buf; *s == ' '; s++ ) {}      // 空白を読み飛ばす
+      if( strncmp( s, "struct ", 7 ) == 0 ){
+        mode = 1;
+        offset = 0;
+        for( s += 7; *s == ' '; s++ ) {}    // 空白を読み飛ばす
+        strcpy( sname, s );
+      }
+      else  if( strcmp( s, "enum" ) == 0 ){
+          mode = 2;
+          offset = 0;
+      }
+      else{
+          fprintf( hOutFile, "%s\n", buf );
+      }
+    }
+
+    // struct文の場合
+    else if( mode == 1 ){
+      for( s = buf; *s == ' '; s++ ) {}      // 空白を読み飛ばす
+      if( strncmp( s, "long ", 5 ) == 0 ){
+        for( s += 5; *s == ' '; s++ ) {}    // 空白を読み飛ばす
+        if( ( t = strstr( s, "#" ) ) != NULL ) *t = '\0';
+        fprintf( hOutFile, " const %s.%s %d\n", sname, s, offset );
+        offset += 8;
+      }
+      else  if( strncmp( s, "int ", 4 ) == 0 ){
+        for( s += 4; *s == ' '; s++ ) {}    // 空白を読み飛ばす
+        if( ( t = strstr( s, "!" ) ) != NULL ) *t = '\0';
+        fprintf( hOutFile, " const %s.%s %d\n", sname, s, offset );
+        offset += 4;
+      }
+      else   if( strncmp( s, "short ", 6 ) == 0 ){
+        for( s += 6; *s == ' '; s++ ) {}    // 空白を読み飛ばす
+        if( ( t = strstr( s, "%" ) ) != NULL ) *t = '\0';
+        fprintf( hOutFile, " const %s.%s %d\n", sname, s, offset );
+        offset += 2;
+      }
+      else  if( strncmp( s, "char ", 5 ) == 0 ){
+        for( s += 5; *s == ' '; s++ ) {}    // 空白を読み飛ばす
+        if( ( t = strstr( s, "$" ) ) != NULL ) *t = '\0';
+        fprintf( hOutFile, " const %s.%s %d\n", sname, s, offset );
+        offset += 1;
+      }
+      else if( strcmp( s, "end" ) == 0 ){
+        fprintf( hOutFile, " const %s.SIZE %d\n", sname, offset );
+        mode = 0;
+      }
+    }
+
+    // enum文の場合
+    else if( mode == 2 ){
+      for( s = buf; *s == ' '; s++ ) {}      // 空白を読み飛ばす
+      if( strcmp( s, "end" ) == 0 ){
+        mode = 0;
+      }
+      else if( *s == '_' || *s >= 'A' ){
+        fprintf( hOutFile, " const %s %d\n", s, offset );
+        offset += 1;
+      }
+    }
+
+  }
+
+  // コンパイル終了
+  fclose( hInFile );
+  fclose( hOutFile );
+}
+
+
 /* コンパイル処理サブルーチン */
 void compile( int pass ){
-
   char buf[1024], outbuf[1024], arg[10][LEN_ARG];
   char *source, **pattern, *ref, *out, *p, *q, *s;
   int  line, arg_p, i;
@@ -359,10 +462,6 @@ void compile( int pass ){
   while( fgets(buf, 1024, hInFile ) != NULL ){
 
 //printf("%d: %s\n", line, buf );
-
-    /* コメントをすてる */
-    if( ( s = strstr( buf, Comment1 ) ) != NULL ) *s = '\0';
-    if( ( s = strstr( buf, Comment2 ) ) != NULL ) *s = '\0';
 
     /* 不要なスペースをすてる */
     for( i = strlen( buf ) - 1; i >= 0 && (buf[ i ] == ' ' || buf[ i ] == '\n'); i-- ) ;
@@ -440,7 +539,7 @@ void compile( int pass ){
     line++;
   }
 
-  /* コンパイル終了 */
+  // コンパイル終了
   fclose( hInFile );
   fclose( hOutFile );
 }
