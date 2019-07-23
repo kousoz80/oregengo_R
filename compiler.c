@@ -115,7 +115,9 @@ char*  pass3[] = {
   " short \\",    "",
   " char \\",     "",
   " count \\",    "",
-  " const \\ \\", "/\\1: equ \\2/\n",
+  " const \\ \\", "/\\1: = \\2/\n",
+  " const_plus \\ \\", "/\\1: += \\2/\n",
+  " const0", "/ = 0/\n",
 
 // if 〜 goto 文
   " if \\<>\\ goto \\",            " \\1,\n \\2,\n jnz \\3\n",
@@ -129,51 +131,7 @@ char*  pass3[] = {
 // for-next (cpu依存する部分あり) ---> ジャンプアドレス($+xxx)
   " for \\#=\\ to \\ step \\",     " \\2,\n \\1#=\n \\3,\n \\1+8#=\n \\4,\n \\1+16#=\n 11(rip),\n \\1+24#=\n",
   " for \\#=\\ to \\",             " \\2,\n \\1#=\n \\3,\n \\1+8#=\n 1,\n \\1+16#=\n 11(rip),\n \\1+24#=\n",
-  " next \\#",                     " \\1#,\n \\1+8#,\n jz $+73\n \\1#,\n \\1+16#,\n +\n \\1#=\n \\1+24#,\n jmp@\n",
-
-// スタック引数関数呼び出し
-  "@\\(\\)[\\,\\,\\,\\,\\] \\", " \\7.,\n \\6.,\n \\5.,\n \\4.,\n \\3.,\n 56.,\n @\\1(\\2)\n \\8\n",
-  "@\\(\\)[\\,\\,\\,\\] \\", " \\6.,\n \\5.,\n \\4.,\n \\3.,\n 48.,\n @\\1(\\2)\n \\7\n",
-  "@\\(\\)[\\,\\,\\] \\", " \\5.,\n \\4.,\n \\3.,\n 40.,\n @\\1(\\2)\n \\6\n",
-  "@\\(\\)[\\,\\] \\", " \\4.,\n \\3.,\n 32.,\n @\\1(\\2)\n \\5\n",
-  "@\\(\\)[\\] \\", " \\3.,\n 24.,\n @\\1(\\2)\n \\4\n",
-
-  "@\\(\\)[\\,\\,\\,\\,\\,\\]", " \\8.,\n \\7.,\n \\6.,\n \\5.,\n \\4.,\n \\3.,\n 64.,\n @\\1(\\2)\n",
-  "@\\(\\)[\\,\\,\\,\\,\\]", " \\7.,\n \\6.,\n \\5.,\n \\4.,\n \\3.,\n 56.,\n @\\1(\\2)\n",
-  "@\\(\\)[\\,\\,\\,\\]", " \\6.,\n \\5.,\n \\4.,\n \\3.,\n 48.,\n @\\1(\\2)\n",
-  "@\\(\\)[\\,\\,\\]", " \\5.,\n \\4.,\n \\3.,\n 40.,\n @\\1(\\2)\n",
-  "@\\(\\)[\\,\\]", " \\4.,\n \\3.,\n 32.,\n @\\1(\\2)\n",
-  "@\\(\\)[\\]", " \\3.,\n 24.,\n @\\1(\\2)\n",
-
-  "@\\[\\,\\,\\,\\,\\,\\] \\", " \\7.,\n \\6.,\n \\5.,\n \\4.,\n \\3.,\n \\2.,\n 64.,\n @\\1\n \\8\n",
-  "@\\[\\,\\,\\,\\,\\] \\", " \\6.,\n \\5.,\n \\4.,\n \\3.,\n \\2.,\n 56.,\n @\\1\n \\7\n",
-  "@\\[\\,\\,\\,\\] \\", " \\5.,\n \\4.,\n \\3.,\n \\2.,\n 48.,\n @\\1\n \\6\n",
-  "@\\[\\,\\,\\] \\", " \\4.,\n \\3.,\n \\2.,\n 40.,\n @\\1\n \\5\n",
-  "@\\[\\,\\] \\", " \\4.,\n \\3.,\n 32.,\n @\\1\n \\4\n",
-  "@\\[\\] \\", " \\2.,\n 24.,\n @\\1\n \\3\n",
-
-  "@\\[\\,\\,\\,\\,\\,\\,\\]", " \\8.,\n \\7.,\n \\6.,\n \\5.,\n \\4.,\n \\3.,\n \\2.,\n 72.,\n @\\1\n",
-  "@\\[\\,\\,\\,\\,\\,\\]", " \\7.,\n \\6.,\n \\5.,\n \\4.,\n \\3.,\n \\2.,\n 64.,\n @\\1\n",
-  "@\\[\\,\\,\\,\\,\\]", " \\6.,\n \\5.,\n \\4.,\n \\3.,\n \\2.,\n 56.,\n @\\1\n",
-  "@\\[\\,\\,\\,\\]", " \\5.,\n \\4.,\n \\3.,\n \\2.,\n 48.,\n @\\1\n",
-  "@\\[\\,\\,\\]", " \\4.,\n \\3.,\n \\2.,\n 40.,\n @\\1\n",
-  "@\\[\\,\\]", " \\4.,\n \\3.,\n 32.,\n @\\1\n",
-  "@\\[\\]", " \\2.,\n 24.,\n @\\1\n",
-
-  "\\[\\,\\,\\,\\,\\,\\] \\", " \\7.,\n \\6.,\n \\5.,\n \\4.,\n \\3.,\n \\2.,\n 64.,\n \\1\n \\8\n",
-  "\\[\\,\\,\\,\\,\\] \\", " \\6.,\n \\5.,\n \\4.,\n \\3.,\n \\2.,\n 56.,\n \\1\n \\7\n",
-  "\\[\\,\\,\\,\\] \\", " \\5.,\n \\4.,\n \\3.,\n \\2.,\n 48.,\n \\1\n \\6\n",
-  "\\[\\,\\,\\] \\", " \\4.,\n \\3.,\n \\2.,\n 40.,\n \\1\n \\5\n",
-  "\\[\\,\\] \\", " \\4.,\n \\3.,\n 32.,\n \\1\n \\4\n",
-  "\\[\\] \\", " \\2.,\n 24.,\n \\1\n \\3\n",
-
-  "\\[\\,\\,\\,\\,\\,\\,\\]", " \\8.,\n \\7.,\n \\6.,\n \\5.,\n \\4.,\n \\3.,\n \\2.,\n 72.,\n \\1\n",
-  "\\[\\,\\,\\,\\,\\,\\]", " \\7.,\n \\6.,\n \\5.,\n \\4.,\n \\3.,\n \\2.,\n 64.,\n \\1\n",
-  "\\[\\,\\,\\,\\,\\]", " \\6.,\n \\5.,\n \\4.,\n \\3.,\n \\2.,\n 56.,\n \\1\n",
-  "\\[\\,\\,\\,\\]", " \\5.,\n \\4.,\n \\3.,\n \\2.,\n 48.,\n \\1\n",
-  "\\[\\,\\,\\]", " \\4.,\n \\3.,\n \\2.,\n 40.,\n \\1\n",
-  "\\[\\,\\]", " \\4.,\n \\3.,\n 32.,\n \\1\n",
-  "\\[\\]", " \\2.,\n 24.,\n \\1\n",
+  " next \\#",                     " \\1#,\n \\1+8#,\n jz $+118\n \\1#,\n \\1+16#,\n +\n \\1#=\n \\1+24#,\n jmp@\n",
 
 // data文
   " data \\,\\,\\,\\,\\,\\,\\,\\", " data\\1\n data\\2\n data\\3\n data\\4\n data\\5\n data\\6\n data\\7\n data\\8\n",
@@ -345,11 +303,11 @@ void strProcess(){
 }
 
 
-// struct, enum構文の処理関数
+// struct/class, enum構文の処理関数
 void compile_s(){
   int mode=0; // 0:通常, 1:struct文 2:enum文
-  char *s, *t, buf[1024], sname[512];
-  int i, offset;
+  char *s, *t, buf[1024], sname[512],cname[512];
+  int i, count;
   
   if( ( hInFile  = fopen( InFile,  "r" ) ) == NULL ){
     printf("struct/enum文の処理中にエラーが発生しました\n" );
@@ -363,74 +321,100 @@ void compile_s(){
 
   while( fgets(buf, 1024, hInFile ) != NULL ){
 
-    // 不要なスペースをすてる
-    for( i = strlen( buf ) - 1; i >= 0 && (buf[ i ] == ' ' || buf[ i ] == '\n'); i-- ) ;
-    buf[ i + 1 ] = '\0';
-
     // コメントをすてる
     if( ( s = strstr( buf, Comment1 ) ) != NULL ) *s = '\0';
     if( ( s = strstr( buf, Comment2 ) ) != NULL ) *s = '\0';
 
+    // 不要な空白文字をすてる
+    for( i = strlen( buf ) - 1; i >= 0 && buf[ i ] <= ' '; i-- ) ;
+    buf[ i + 1 ] = '\0';
+
+    // 空文の場合はファイルからの読み込みに戻る
+    if( buf[0]=='\0' ) continue;
+
     // 通常文の場合
     if( mode == 0 ){
-      for( s = buf; *s == ' '; s++ ) {}      // 空白を読み飛ばす
+      for( s = buf; *s == ' ' || *s == '\t'; s++ ) {}      // 空白を読み飛ばす
       if( strncmp( s, "struct ", 7 ) == 0 ){
         mode = 1;
-        offset = 0;
-        for( s += 7; *s == ' '; s++ ) {}    // 空白を読み飛ばす
+        count = 0;
+        for( s += 7; *s == ' ' || *s == '\t'; s++ ) {}    // 空白を読み飛ばす
         strcpy( sname, s );
+        fprintf( hOutFile, " const0\n" );
+      }
+      else if( strncmp( s, "class ", 6 ) == 0 ){
+        mode = 1;
+        count = 0;
+        for( s += 6; *s == ' ' || *s == '\t'; s++ ) {}    // 空白を読み飛ばす
+        strcpy( sname, s );
+        fprintf( hOutFile, " const0\n" );
       }
       else  if( strcmp( s, "enum" ) == 0 ){
           mode = 2;
-          offset = 0;
+          count = 0;
       }
       else{
           fprintf( hOutFile, "%s\n", buf );
       }
     }
 
-    // struct文の場合
+    // class/struct 文の場合
     else if( mode == 1 ){
-      for( s = buf; *s == ' '; s++ ) {}      // 空白を読み飛ばす
+      for( s = buf; *s == ' ' || *s == '\t'; s++ ) {}      // 空白を読み飛ばす
+
+      // long型
       if( strncmp( s, "long ", 5 ) == 0 ){
-        for( s += 5; *s == ' '; s++ ) {}    // 空白を読み飛ばす
+        for( s += 5; *s == ' ' || *s == '\t'; s++ ) {}    // 空白を読み飛ばす
         if( ( t = strstr( s, "#" ) ) != NULL ) *t = '\0';
-        fprintf( hOutFile, " const %s.%s %d\n", sname, s, offset );
-        offset += 8;
+        fprintf( hOutFile, " const_plus %s.%s 8\n", sname, s );
       }
+
+      // int型
       else  if( strncmp( s, "int ", 4 ) == 0 ){
-        for( s += 4; *s == ' '; s++ ) {}    // 空白を読み飛ばす
+        for( s += 4; *s == ' ' || *s == '\t'; s++ ) {}    // 空白を読み飛ばす
         if( ( t = strstr( s, "!" ) ) != NULL ) *t = '\0';
-        fprintf( hOutFile, " const %s.%s %d\n", sname, s, offset );
-        offset += 4;
+        fprintf( hOutFile, " const_plus %s.%s 4\n", sname, s );
       }
+
+      // short型
       else   if( strncmp( s, "short ", 6 ) == 0 ){
-        for( s += 6; *s == ' '; s++ ) {}    // 空白を読み飛ばす
+        for( s += 6; *s == ' ' || *s == '\t'; s++ ) {}    // 空白を読み飛ばす
         if( ( t = strstr( s, "%" ) ) != NULL ) *t = '\0';
-        fprintf( hOutFile, " const %s.%s %d\n", sname, s, offset );
-        offset += 2;
+        fprintf( hOutFile, " const_plus %s.%s 2\n", sname, s );
       }
+
+      // char型
       else  if( strncmp( s, "char ", 5 ) == 0 ){
-        for( s += 5; *s == ' '; s++ ) {}    // 空白を読み飛ばす
+        for( s += 5; *s == ' ' || *s == '\t'; s++ ) {}    // 空白を読み飛ばす
         if( ( t = strstr( s, "$" ) ) != NULL ) *t = '\0';
-        fprintf( hOutFile, " const %s.%s %d\n", sname, s, offset );
-        offset += 1;
+        fprintf( hOutFile, " const_plus %s.%s 1\n", sname, s );
       }
+
+      // 終了
       else if( strcmp( s, "end" ) == 0 ){
-        fprintf( hOutFile, " const %s.SIZE %d\n", sname, offset );
+        fprintf( hOutFile, " const_plus %s.SIZE 0\n", sname );
         mode = 0;
       }
+
+      // クラス型
+      else{
+        for( t = cname; *s != ' '; s++ ) { *t++ = *s; }    // クラス名を読み込む
+        *t = '\0';
+        while( *s == ' ' || *s == '\t') { s++;}    // 空白を読み飛ばす
+        fprintf( hOutFile, " const_plus %s.%s %s.SIZE\n", sname, s, cname );
+      }
+
     }
 
     // enum文の場合
     else if( mode == 2 ){
-      for( s = buf; *s == ' '; s++ ) {}      // 空白を読み飛ばす
+      for( s = buf; *s == ' ' || *s == '\t'; s++ ) {}      // 空白を読み飛ばす
       if( strcmp( s, "end" ) == 0 ){
         mode = 0;
       }
       else if( *s == '_' || *s >= 'A' ){
-        fprintf( hOutFile, " const %s %d\n", s, offset );
-        offset += 1;
+        fprintf( hOutFile, " const %s %d\n", s, count );
+        count++;
       }
     }
 
@@ -463,8 +447,8 @@ void compile( int pass ){
 
 //printf("%d: %s\n", line, buf );
 
-    /* 不要なスペースをすてる */
-    for( i = strlen( buf ) - 1; i >= 0 && (buf[ i ] == ' ' || buf[ i ] == '\n'); i-- ) ;
+    /* 不要な空白文字をすてる */
+    for( i = strlen( buf ) - 1; i >= 0 && buf[ i ] <= ' '; i-- ) ;
     buf[ i + 1 ] = '\0';
 
     /* 文字列ポインタ arg[0] に現在の行を代入する */
@@ -488,8 +472,8 @@ void compile( int pass ){
 
         /* スペースの場合 */
         case ' ':
-          if( *source != ' ' ) goto next_pattern;
-          while( *source == ' ' ) source++;
+          if( *source > ' ' ) goto next_pattern;
+          while( *source <= ' ' && *source > '\0' ) source++;
           if( *source == '\0' ) goto next_pattern;
           ref++;
           break;
