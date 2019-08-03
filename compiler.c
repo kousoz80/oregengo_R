@@ -90,6 +90,12 @@ char*  pass1[] = {
 char*  pass2[] = {
  ".data", "/ align 8/\n",
  " .data", "/ align 8/\n", 
+  " if \\.<>\\ then \\", " if \\1.=\\2 goto L\\0\n \\3\nL\\0:\n",
+  " if \\.>=\\ then \\", " if \\1.<\\2 goto L\\0\n \\3\nL\\0:\n",
+  " if \\.<=\\ then \\", " if \\1.>\\2 goto L\\0\n \\3\nL\\0:\n",
+  " if \\.>\\ then \\",  " if \\1.<=\\2 goto L\\0\n \\3\nL\\0:\n",
+  " if \\.<\\ then \\",  " if \\1.>=\\2 goto L\\0\n \\3\nL\\0:\n",
+  " if \\.=\\ then \\",  " if \\1.<>\\2 goto L\\0\n \\3\nL\\0:\n",
   " if \\<>\\ then \\", " if \\1=\\2 goto L\\0\n \\3\nL\\0:\n",
   " if \\>=\\ then \\", " if \\1<\\2 goto L\\0\n \\3\nL\\0:\n",
   " if \\<=\\ then \\", " if \\1>\\2 goto L\\0\n \\3\nL\\0:\n",
@@ -120,6 +126,12 @@ char*  pass3[] = {
   " const0", "/ = 0/\n",
 
 // if 〜 goto 文
+  " if \\.<>\\ goto \\",            " \\1,\n \\2,\n .jnz \\3\n",
+  " if \\.>=\\ goto \\",            " \\1,\n \\2,\n .jge \\3\n",
+  " if \\.<=\\ goto \\",            " \\2,\n \\1,\n .jge \\3\n",
+  " if \\.>\\ goto \\",             " \\2,\n \\1,\n .jlt \\3\n",
+  " if \\.<\\ goto \\",             " \\1,\n \\2,\n .jlt \\3\n",
+  " if \\.=\\ goto \\",             " \\1,\n \\2,\n .jz \\3\n",
   " if \\<>\\ goto \\",            " \\1,\n \\2,\n jnz \\3\n",
   " if \\>=\\ goto \\",            " \\1,\n \\2,\n jge \\3\n",
   " if \\<=\\ goto \\",            " \\2,\n \\1,\n jge \\3\n",
