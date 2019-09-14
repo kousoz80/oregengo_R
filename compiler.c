@@ -5,7 +5,8 @@
   "compiler.c" 
 
     oregengo_R
-    独自言語コンパイラ ver 1.1
+    独自言語コンパイラ ver 1.2
+   (struct/class命令対応版)
    
   asm_x64形式のアセンブラソースファイルを生成
   ソースファイル名は "asm.s"となる
@@ -90,6 +91,12 @@ char*  pass1[] = {
 char*  pass2[] = {
  ".data", "/ align 8/\n",
  " .data", "/ align 8/\n", 
+  " if \\.<>\\ then \\", " if \\1.=\\2 goto L\\0\n \\3\nL\\0:\n",
+  " if \\.>=\\ then \\", " if \\1.<\\2 goto L\\0\n \\3\nL\\0:\n",
+  " if \\.<=\\ then \\", " if \\1.>\\2 goto L\\0\n \\3\nL\\0:\n",
+  " if \\.>\\ then \\",  " if \\1.<=\\2 goto L\\0\n \\3\nL\\0:\n",
+  " if \\.<\\ then \\",  " if \\1.>=\\2 goto L\\0\n \\3\nL\\0:\n",
+  " if \\.=\\ then \\",  " if \\1.<>\\2 goto L\\0\n \\3\nL\\0:\n",
   " if \\<>\\ then \\", " if \\1=\\2 goto L\\0\n \\3\nL\\0:\n",
   " if \\>=\\ then \\", " if \\1<\\2 goto L\\0\n \\3\nL\\0:\n",
   " if \\<=\\ then \\", " if \\1>\\2 goto L\\0\n \\3\nL\\0:\n",
@@ -109,13 +116,23 @@ char*  pass3[] = {
   "/\\/",  "/\\1/\n",
   "\\:",    "\\1:\n",
 
+// 宣言文は無視する
   " long \\",      "",
   " int \\",      "",
   " short \\",    "",
   " char \\",     "",
   " count \\",    "",
-  " const \\ \\", "/\\1: equ \\2/\n",
+  " const \\ \\", "/\\1: = \\2/\n",
+  " const_plus \\ \\", "/\\1: += \\2/\n",
+  " const0", "/ = 0/\n",
 
+// if 〜 goto 文
+  " if \\.<>\\ goto \\",            " \\1,\n \\2,\n .jnz \\3\n",
+  " if \\.>=\\ goto \\",            " \\1,\n \\2,\n .jge \\3\n",
+  " if \\.<=\\ goto \\",            " \\2,\n \\1,\n .jge \\3\n",
+  " if \\.>\\ goto \\",             " \\2,\n \\1,\n .jlt \\3\n",
+  " if \\.<\\ goto \\",             " \\1,\n \\2,\n .jlt \\3\n",
+  " if \\.=\\ goto \\",             " \\1,\n \\2,\n .jz \\3\n",
   " if \\<>\\ goto \\",            " \\1,\n \\2,\n jnz \\3\n",
   " if \\>=\\ goto \\",            " \\1,\n \\2,\n jge \\3\n",
   " if \\<=\\ goto \\",            " \\2,\n \\1,\n jge \\3\n",
@@ -127,8 +144,9 @@ char*  pass3[] = {
 // for-next (cpu依存する部分あり) ---> ジャンプアドレス($+xxx)
   " for \\#=\\ to \\ step \\",     " \\2,\n \\1#=\n \\3,\n \\1+8#=\n \\4,\n \\1+16#=\n 11(rip),\n \\1+24#=\n",
   " for \\#=\\ to \\",             " \\2,\n \\1#=\n \\3,\n \\1+8#=\n 1,\n \\1+16#=\n 11(rip),\n \\1+24#=\n",
-  " next \\#",                     " \\1#,\n \\1+8#,\n jz $+73\n \\1#,\n \\1+16#,\n +\n \\1#=\n \\1+24#,\n jmp@\n",
+  " next \\#",                     " \\1#,\n \\1+8#,\n jz $+118\n \\1#,\n \\1+16#,\n +\n \\1#=\n \\1+24#,\n jmp@\n",
 
+// data文
   " data \\,\\,\\,\\,\\,\\,\\,\\", " data\\1\n data\\2\n data\\3\n data\\4\n data\\5\n data\\6\n data\\7\n data\\8\n",
   " data \\,\\,\\,\\,\\,\\,\\",    " data\\1\n data\\2\n data\\3\n data\\4\n data\\5\n data\\6\n data\\7\n",
   " data \\,\\,\\,\\,\\,\\",       " data\\1\n data\\2\n data\\3\n data\\4\n data\\5\n data\\6\n",
@@ -138,6 +156,7 @@ char*  pass3[] = {
   " data \\,\\",                   " data\\1\n data\\2\n",
   " data \\",                      " data\\1\n",
 
+// 一般のステートメント
   " \\ \\ \\ \\ \\ \\ \\ \\",      " \\1\n \\2\n \\3\n \\4\n \\5\n \\6\n \\7\n \\8\n",
   " \\ \\ \\ \\ \\ \\ \\",         " \\1\n \\2\n \\3\n \\4\n \\5\n \\6\n \\7\n",
   " \\ \\ \\ \\ \\ \\",            " \\1\n \\2\n \\3\n \\4\n \\5\n \\6\n",
@@ -157,6 +176,7 @@ char*  pass3[] = {
 /* プロトタイプ宣言  */
 void catFile( char* fname );
 void strProcess();
+void compile_s();
 void compile( int pass );
 
 //変数宣言
@@ -204,10 +224,16 @@ int main( int argc, char* argv[] ){
 
   /* コンパイル開始 */
   strProcess();  // 文字列の処理
+  Tmp     = OutFile;
+  OutFile = InFile;
+  InFile  = Tmp;
+
+  compile_s();   // struct/enum構文の処理
   Tmp     = InFile;
   InFile  = OutFile;
   OutFile = VarFile;
   VarFile = Tmp;
+
   compile( 0 );   /* 宣言文の処理 */
   Tmp     = OutFile;
   OutFile = VarFile;
@@ -274,6 +300,13 @@ void strProcess(){
         fprintf( hStrFile, "  byte %d\n", c );
       }
       fprintf( hStrFile, "  byte 0\n" );
+      if( c == EOF ) break;
+    }
+    else if( c == (int)'\'' ){
+      if( ( c = getc( hInFile  ) ) == EOF ) break;
+      fprintf( hOutFile, "%d", c );
+      while( ( c = getc( hInFile  ) ) != '\'' && c != EOF ) {}
+      if( c == EOF ) break;
     }
     else  putc( c, hOutFile );
   }
@@ -283,9 +316,131 @@ void strProcess(){
 }
 
 
+// struct/class, enum構文の処理関数
+void compile_s(){
+  int mode=0; // 0:通常, 1:struct文 2:enum文
+  char *s, *t, buf[1024], sname[512],cname[512];
+  int i, count;
+  
+  if( ( hInFile  = fopen( InFile,  "r" ) ) == NULL ){
+    printf("struct/enum文の処理中にエラーが発生しました\n" );
+    return;
+  }
+  if( ( hOutFile =  fopen( OutFile, "w" ) ) == NULL ){
+    close( hInFile );
+    printf("struct/enum文の処理中にエラーが発生しました\n" );
+    return;
+  }
+
+  while( fgets(buf, 1024, hInFile ) != NULL ){
+
+    // コメントをすてる
+    if( ( s = strstr( buf, Comment1 ) ) != NULL ) *s = '\0';
+    if( ( s = strstr( buf, Comment2 ) ) != NULL ) *s = '\0';
+
+    // 不要な空白文字をすてる
+    for( i = strlen( buf ) - 1; i >= 0 && buf[ i ] <= ' '; i-- ) ;
+    buf[ i + 1 ] = '\0';
+
+    // 空文の場合はファイルからの読み込みに戻る
+    if( buf[0]=='\0' ) continue;
+
+    // 通常文の場合
+    if( mode == 0 ){
+      for( s = buf; *s == ' ' || *s == '\t'; s++ ) {}      // 空白を読み飛ばす
+      if( strncmp( s, "struct ", 7 ) == 0 ){
+        mode = 1;
+        count = 0;
+        for( s += 7; *s == ' ' || *s == '\t'; s++ ) {}    // 空白を読み飛ばす
+        strcpy( sname, s );
+        fprintf( hOutFile, " const0\n" );
+      }
+      else if( strncmp( s, "class ", 6 ) == 0 ){
+        mode = 1;
+        count = 0;
+        for( s += 6; *s == ' ' || *s == '\t'; s++ ) {}    // 空白を読み飛ばす
+        strcpy( sname, s );
+        fprintf( hOutFile, " const0\n" );
+      }
+      else  if( strcmp( s, "enum" ) == 0 ){
+          mode = 2;
+          count = 0;
+      }
+      else{
+          fprintf( hOutFile, "%s\n", buf );
+      }
+    }
+
+    // class/struct 文の場合
+    else if( mode == 1 ){
+      for( s = buf; *s == ' ' || *s == '\t'; s++ ) {}      // 空白を読み飛ばす
+
+      // long型
+      if( strncmp( s, "long ", 5 ) == 0 ){
+        for( s += 5; *s == ' ' || *s == '\t'; s++ ) {}    // 空白を読み飛ばす
+        if( ( t = strstr( s, "#" ) ) != NULL ) *t = '\0';
+        fprintf( hOutFile, " const_plus %s.%s 8\n", sname, s );
+      }
+
+      // int型
+      else  if( strncmp( s, "int ", 4 ) == 0 ){
+        for( s += 4; *s == ' ' || *s == '\t'; s++ ) {}    // 空白を読み飛ばす
+        if( ( t = strstr( s, "!" ) ) != NULL ) *t = '\0';
+        fprintf( hOutFile, " const_plus %s.%s 4\n", sname, s );
+      }
+
+      // short型
+      else   if( strncmp( s, "short ", 6 ) == 0 ){
+        for( s += 6; *s == ' ' || *s == '\t'; s++ ) {}    // 空白を読み飛ばす
+        if( ( t = strstr( s, "%" ) ) != NULL ) *t = '\0';
+        fprintf( hOutFile, " const_plus %s.%s 2\n", sname, s );
+      }
+
+      // char型
+      else  if( strncmp( s, "char ", 5 ) == 0 ){
+        for( s += 5; *s == ' ' || *s == '\t'; s++ ) {}    // 空白を読み飛ばす
+        if( ( t = strstr( s, "$" ) ) != NULL ) *t = '\0';
+        fprintf( hOutFile, " const_plus %s.%s 1\n", sname, s );
+      }
+
+      // 終了
+      else if( strcmp( s, "end" ) == 0 ){
+        fprintf( hOutFile, " const_plus %s.SIZE 0\n", sname );
+        mode = 0;
+      }
+
+      // クラス型
+      else{
+        for( t = cname; *s != ' '; s++ ) { *t++ = *s; }    // クラス名を読み込む
+        *t = '\0';
+        while( *s == ' ' || *s == '\t') { s++;}    // 空白を読み飛ばす
+        fprintf( hOutFile, " const_plus %s.%s %s.SIZE\n", sname, s, cname );
+      }
+
+    }
+
+    // enum文の場合
+    else if( mode == 2 ){
+      for( s = buf; *s == ' ' || *s == '\t'; s++ ) {}      // 空白を読み飛ばす
+      if( strcmp( s, "end" ) == 0 ){
+        mode = 0;
+      }
+      else if( *s == '_' || *s >= 'A' ){
+        fprintf( hOutFile, " const %s %d\n", s, count );
+        count++;
+      }
+    }
+
+  }
+
+  // コンパイル終了
+  fclose( hInFile );
+  fclose( hOutFile );
+}
+
+
 /* コンパイル処理サブルーチン */
 void compile( int pass ){
-
   char buf[1024], outbuf[1024], arg[10][LEN_ARG];
   char *source, **pattern, *ref, *out, *p, *q, *s;
   int  line, arg_p, i;
@@ -305,12 +460,8 @@ void compile( int pass ){
 
 //printf("%d: %s\n", line, buf );
 
-    /* コメントをすてる */
-    if( ( s = strstr( buf, Comment1 ) ) != NULL ) *s = '\0';
-    if( ( s = strstr( buf, Comment2 ) ) != NULL ) *s = '\0';
-
-    /* 不要なスペースをすてる */
-    for( i = strlen( buf ) - 1; i >= 0 && (buf[ i ] == ' ' || buf[ i ] == '\n'); i-- ) ;
+    /* 不要な空白文字をすてる */
+    for( i = strlen( buf ) - 1; i >= 0 && buf[ i ] <= ' '; i-- ) ;
     buf[ i + 1 ] = '\0';
 
     /* 文字列ポインタ arg[0] に現在の行を代入する */
@@ -334,8 +485,8 @@ void compile( int pass ){
 
         /* スペースの場合 */
         case ' ':
-          if( *source != ' ' ) goto next_pattern;
-          while( *source == ' ' ) source++;
+          if( *source > ' ' ) goto next_pattern;
+          while( *source <= ' ' && *source > '\0' ) source++;
           if( *source == '\0' ) goto next_pattern;
           ref++;
           break;
@@ -385,7 +536,7 @@ void compile( int pass ){
     line++;
   }
 
-  /* コンパイル終了 */
+  // コンパイル終了
   fclose( hInFile );
   fclose( hOutFile );
 }
