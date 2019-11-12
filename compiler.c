@@ -5,8 +5,9 @@
   "compiler.c" 
 
     oregengo_R
-    独自言語コンパイラ ver 1.2
-   (struct/class命令対応版)
+    独自言語コンパイラ ver 1.3
+   (struct/class構文対応版)
+   今回の変更点: struct/class構文のfield文を追加
    
   asm_x64形式のアセンブラソースファイルを生成
   ソースファイル名は "asm.s"となる
@@ -371,12 +372,18 @@ void compile_s(){
       }
     }
 
-    // class/struct 文の場合
+    // class/struct構文の場合
     else if( mode == 1 ){
       for( s = buf; *s == ' ' || *s == '\t'; s++ ) {}      // 空白を読み飛ばす
 
+      // field文
+      if( strncmp( s, "field ", 6 ) == 0 ){
+        for( s += 6; *s == ' ' || *s == '\t'; s++ ) {}    // 空白を読み飛ばす
+        fprintf( hOutFile, " const_plus %s.%s 0\n", sname, s );
+      }
+
       // long型
-      if( strncmp( s, "long ", 5 ) == 0 ){
+      else if( strncmp( s, "long ", 5 ) == 0 ){
         for( s += 5; *s == ' ' || *s == '\t'; s++ ) {}    // 空白を読み飛ばす
         if( ( t = strstr( s, "#" ) ) != NULL ) *t = '\0';
         fprintf( hOutFile, " const_plus %s.%s 8\n", sname, s );
