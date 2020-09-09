@@ -1,12 +1,12 @@
-// oregengo-R for ARM CPU コードジェネレータ定義データ
+// oregengo-R for ARM CPU コードジェネレータ 定義データ
 char* codegen[] = {
 "/\\/", "\\1\n",
 " \\:", "\\1:\n",
 "\\:", "\\1:\n",
 " jge \\", " r1-r0\n jge \\1\n",
 " jlt \\", " r1-r0\n jlt \\1\n",
-" jz \\", " r1-r0\n jz \\1\n",
-" jnz \\", " r1-r0\n jnz \\1\n",
+" jz \\", " r1-r0\n jeq \\1\n",
+" jnz \\", " r1-r0\n jne \\1\n",
 " jmp \\", " jmp \\1\n",
 " goto\\", " jmp \\1\n",
 " +", " r0=r0+r1\n",
@@ -28,6 +28,7 @@ char* codegen[] = {
 " xor", " r0=r0^r1\n",
 " getchar$,", " lr=pc+20\n sp=sp-4\n (sp)=lr\n r8=&getchar\n pc=r8\n",
 " inkey$,", " lr=pc+20\n sp=sp-4\n (sp)=lr\n r8=&inkey\n pc=r8\n",
+" \\(pc),", " r7=r6\n r6=r5\n r5=r4\n r4=r3\n r3=r2\n r2=r1\n r1=r0\n r8=&\\1\n r0=pc+r8\n",
 " end", " lr=(sp)#\n sp=sp+4\n ret\n",
 " return", " lr=(sp)#\n sp=sp+4\n ret\n",
 " jmp@", " pc=r0\n",

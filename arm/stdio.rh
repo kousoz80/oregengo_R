@@ -9,8 +9,8 @@
  const PLUS     43          /* プラス記号の文字コード */
  const MINUS    45          /* マイナス記号の文字コード */
  const ESC      27          /* ESCキーの文字コード */
- const NaN      0x8000000000000000  /* ゼロ除算が発生したことをあらわす */
- const STACK_SIZE 1000
+ const NaN      0x80000000  /* ゼロ除算が発生したことをあらわす */
+ const STACK_SIZE 8000
 
  /* 作業変数 */
  char  __fbuf$(512)  /* ファイル読み書き用のバッファ */
@@ -19,18 +19,73 @@
  long   __p1#,__p2#,__p3#,__p4#,__p5#,__p6#,__p7#
  long __t#,read_p# // data文へのポインタ
  long  __stack#(STACK_SIZE)
- long  __stack_top#,__stack_p#
- long  __critical#
+ long  __stack_top#
 
 /* プログラム開始位置 */
 _start:
-  __stack_top, __stack_p#=
-  0, __critical#=
-  main
-/ rax=60/
-/ syscall/
-/ ret/
+/ sp=&__stack_top/
+ main
+/ r7=1/
+/ svc 0/
 
+
+// 符号付き除算
+idiv:
+/ r8=r0^r1/
+/ sp=sp-4/
+/ (sp)#=r8/
+/ r9=0/
+/ r0-r9/
+/ jlt idiv1/
+/ r0=r9-r0/
+idiv1:
+/ r1-r9/
+/ jlt idiv2/
+/ r1=r9-r1/
+idiv2:
+ udiv
+/ r8=(sp)#/
+/ dp=sp+4/
+/ r9=0/
+/ r8-r9/
+/ jlt idiv2/
+/ r0=r9-r0/
+ end
+
+
+// 符号なし除算
+udiv:
+/ r0-0/
+/ jeq udiv_zero/
+/ r1-r0/
+/ jlt udiv_under/
+/ clz r8.r0/
+/ clz r9,r1/
+/ r9=r9-r8/
+/ r0=r0<<r9/
+/ r8=1/
+/ r8=r8<<r9/
+/ r10=0/
+udiv1:
+/ r9=r1-r0/
+/ jlt udiv2/
+/ r1=r9/
+/ r10=r10+r8/
+udiv2:
+/ r0=r0>>1/
+/ r8=r8>>1/
+/ r8-0/
+/ jne udiv1/
+/ r0=r10/
+ end
+
+udiv_zero:
+/ r0=&NaN/
+  end
+
+udiv_under:
+/ r0=0/
+ end
 
 /* コンソールからから一文字読み込む */
 getchar:
@@ -47,9 +102,8 @@ getc:
 
 /* ファイルから読み込む( size, buf, hFile, _read ) */
 _read:
-/ rax=0/
-/ syscall/
-/ rdi=rax/
+/ r7=3/
+/ svc 0/
   end
 
 
@@ -68,29 +122,27 @@ putc:
 
 /* ファイルへ書き込む( size, buf, hFile, _write ) */
 _write:
-/ rax=1/
-/ syscall/
-/ rdi=rax/
+/ r7=4/
+/ svc 0/
   end
 
 
 // 書き込みモードでファイルを開く
 wopen:
-/ rsi=577/
-/ rdx=438/
+/ r1=&577/
+/ r2=&438/
 / jmp open/
 
 
 // 読み出しモードでファイルを開く
 ropen:
-/rsi=0/
+/ r1=0/
 
 
 // ファイルを開く
 open:
-/ rax=2/
-/ syscall/
-/ rdi=rax/
+/ r7=5/
+/ svc 0/
   end
  
  
@@ -98,9 +150,8 @@ open:
 wclose:
 rclose:
 close:
-/ rax=1/
-/ syscall/
-/ rdi=rax/
+/ r7=6/
+/ svc 0/
   end
  
 /* 文字列を表示する */

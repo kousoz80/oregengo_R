@@ -73,14 +73,14 @@ char*  pass1[] = {
   " char \\$,\\$",                         " align 4\n\\1: memory 1\n\\2: memory 1\n",
   " char \\$",                             " align 4\n\\1: memory 1\n",
 
-  " count \\#,\\#,\\#,\\#,\\#,\\#,\\#,\\#", " align 4\n\\1: memory 32\n\\2: memory 32\n\\3: memory 32\n\\4: memory 32\n\\5: memory 32\n\\6: memory 32\n\\7: memory 32\n\\8: memory 32\n",
-  " count \\#,\\#,\\#,\\#,\\#,\\#,\\#",     " align 4\n\\1: memory 32\n\\2: memory 32\n\\3: memory 32\n\\4: memory 32\n\\5: memory 32\n\\6: memory 32\n\\7: memory 32\n",
-  " count \\#,\\#,\\#,\\#,\\#,\\#",         " align 4\n\\1: memory 32\n\\2: memory 32\n\\3: memory 32\n\\4: memory 32\n\\5: memory 32\n\\6: memory 32\n",
-  " count \\#,\\#,\\#,\\#,\\#",             " align 4\n\\1: memory 32\n\\2: memory 32\n\\3: memory 32\n\\4: memory 32\n\\5: memory 32\n",
-  " count \\#,\\#,\\#,\\#",                 " align 4\n\\1: memory 32\n\\2: memory 32\n\\3: memory 32\n\\4: memory 32\n",
-  " count \\#,\\#,\\#",                     " align 4\n\\1: memory 32\n\\2: memory 32\n\\3: memory 32\n",
-  " count \\#,\\#",                         " align 4\n\\1: memory 32\n\\2: memory 32\n",
-  " count \\#",                             " align 4\n\\1: memory 32\n",
+  " count \\#,\\#,\\#,\\#,\\#,\\#,\\#,\\#", " align 4\n\\1: memory 16\n\\2: memory 16\n\\3: memory 16\n\\4: memory 16\n\\5: memory 16\n\\6: memory 16\n\\7: memory 16\n\\8: memory 16\n",
+  " count \\#,\\#,\\#,\\#,\\#,\\#,\\#",     " align 4\n\\1: memory 16\n\\2: memory 16\n\\3: memory 16\n\\4: memory 16\n\\5: memory 16\n\\6: memory 16\n\\7: memory 16\n",
+  " count \\#,\\#,\\#,\\#,\\#,\\#",         " align 4\n\\1: memory 16\n\\2: memory 16\n\\3: memory 16\n\\4: memory 16\n\\5: memory 16\n\\6: memory 16\n",
+  " count \\#,\\#,\\#,\\#,\\#",             " align 4\n\\1: memory 16\n\\2: memory 16\n\\3: memory 16\n\\4: memory 16\n\\5: memory 16\n",
+  " count \\#,\\#,\\#,\\#",                 " align 4\n\\1: memory 16\n\\2: memory 16\n\\3: memory 16\n\\4: memory 16\n",
+  " count \\#,\\#,\\#",                     " align 4\n\\1: memory 16\n\\2: memory 16\n\\3: memory 16\n",
+  " count \\#,\\#",                         " align 4\n\\1: memory 16\n\\2: memory 16\n",
+  " count \\#",                             " align 4\n\\1: memory 16\n",
 
   NULL
 };
@@ -141,9 +141,9 @@ char*  pass3[] = {
   " goto \\",                      " jmp \\1\n",
 
 // for-next (cpu依存する部分あり) ---> ジャンプアドレス($+xxx)
-  " for \\#=\\ to \\ step \\",     " \\2,\n \\1#=\n \\3,\n \\1+8#=\n \\4,\n \\1+16#=\n 11(rip),\n \\1+24#=\n",
-  " for \\#=\\ to \\",             " \\2,\n \\1#=\n \\3,\n \\1+8#=\n 1,\n \\1+16#=\n 11(rip),\n \\1+24#=\n",
-  " next \\#",                     " \\1#,\n \\1+8#,\n jz $+118\n \\1#,\n \\1+16#,\n +\n \\1#=\n \\1+24#,\n jmp@\n",
+  " for \\#=\\ to \\ step \\",     " \\2,\n \\1#=\n \\3,\n \\1+4#=\n \\4,\n \\1+8#=\n 12(pc),\n \\1+12#=\n",
+  " for \\#=\\ to \\",             " \\2,\n \\1#=\n \\3,\n \\1+4#=\n 1,\n \\1+8#=\n 12(pc),\n \\1+12#=\n",
+  " next \\#",                     " \\1#,\n \\1+4#,\n jz $+160\n \\1#,\n \\1+8#,\n +\n \\1#=\n \\1+12#,\n jmp@\n",
 
 // data文
   " data \\,\\,\\,\\,\\,\\,\\,\\", " data\\1\n data\\2\n data\\3\n data\\4\n data\\5\n data\\6\n data\\7\n data\\8\n",
