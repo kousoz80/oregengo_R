@@ -284,7 +284,7 @@ void strProcess(){
   }
   if( ( hOutFile = fopen( OutFile, "w") ) == NULL ){
     printf( "文字列処理:出力エラー" ) ;
-    close( hInFile );
+    fclose( hInFile );
     return;
   }
   if( ( hStrFile = fopen( StrFile, "w") ) == NULL ){
@@ -328,7 +328,7 @@ void compile_s(){
     return;
   }
   if( ( hOutFile =  fopen( OutFile, "w" ) ) == NULL ){
-    close( hInFile );
+    fclose( hInFile );
     printf("struct/enum文の処理中にエラーが発生しました\n" );
     return;
   }
@@ -457,7 +457,7 @@ void compile( int pass ){
     return;
   }
   if( ( hOutFile =  fopen( OutFile, "w" ) ) == NULL ){
-    close( hInFile );
+    fclose( hInFile );
     printf("中間ファイルの書き込みでエラーが発生しました, pass=%d\n", pass);
     return;
   }
