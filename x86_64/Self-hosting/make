@@ -1,0 +1,14 @@
+#!/bin/sh
+echo compile orc.r
+../orc stdio.rh orc.r codegen.r
+java -jar ../asm_x64.jar -p0xa8000 -efi asm.s orc.EFI
+
+echo compile asm.r
+../orc stdio.rh asm.r
+java -jar ../asm_x64.jar -p0xa8000 -efi asm.s asm.EFI
+
+rm asm.s
+rm __str
+rm __var
+rm __tmp1
+rm __tmp2
