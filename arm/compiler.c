@@ -5,10 +5,15 @@
   "compiler.c" 
 
     oregengo_R
-    独自言語コンパイラ for ARM CPU
+    独自言語コンパイラ for ARM CPU　ver 0.1
 
   asm_arm形式のアセンブラソースファイルを生成
+
+  コンパイルコマンド: gcc -o orc compiler.c
+  実行コマンド: ./orc stdio.rh (ソースファイル.r) 
+
   ソースファイル名は "asm.s"となる
+   
 
 */
 

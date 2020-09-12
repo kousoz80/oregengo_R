@@ -24,7 +24,10 @@
 /* プログラム開始位置 */
 _start:
 / sp=&__stack_top/
+
  main
+
+/ r0=0/
 / r7=1/
 / svc 0/
 
@@ -45,11 +48,12 @@ idiv1:
 idiv2:
  udiv
 / r8=(sp)#/
-/ dp=sp+4/
+/ sp=sp+4/
 / r9=0/
 / r8-r9/
-/ jlt idiv2/
+/ jge idiv3/
 / r0=r9-r0/
+idiv3:
  end
 
 
@@ -59,30 +63,37 @@ udiv:
 / jeq udiv_zero/
 / r1-r0/
 / jlt udiv_under/
-/ clz r8.r0/
+/ clz r8,r0/
 / clz r9,r1/
-/ r9=r9-r8/
-/ r0=r0<<r9/
-/ r8=1/
-/ r8=r8<<r9/
+/ r8=r8-r9/
+/ r0=r0<<r8/
+/ r9=1/
+/ r9=r9<<r8/
 / r10=0/
 udiv1:
-/ r9=r1-r0/
+/ r8=r1-r0/
+/ r8-0/
 / jlt udiv2/
-/ r1=r9/
-/ r10=r10+r8/
+/ r1=r8/
+/ r10=r10+r9/
 udiv2:
 / r0=r0>>1/
-/ r8=r8>>1/
-/ r8-0/
+/ r9=r9>>1/
+/ r9-0/
 / jne udiv1/
 / r0=r10/
  end
 
+// ゼロ除算(演算結果はNaN)
 udiv_zero:
 / r0=&NaN/
   end
 
+// 除算の余り
+mod:
+ udiv swap end
+
+// アンダーフロー(演算結果は0)
 udiv_under:
 / r0=0/
  end
@@ -96,7 +107,7 @@ getchar:
 getc:
   __t#=
   0, __fbuf$=
-  1, &__fbuf, __t#, _read
+  1, __fbuf, __t#, _read
   __fbuf$, return
 
 
@@ -116,7 +127,7 @@ putchar:
 putc:
   __t#= pop __fbuf$=
   0, __fbuf$(1)=
-  1, &__fbuf, __t#, _write
+  1, __fbuf, __t#, _write
   return
 
 
@@ -345,7 +356,7 @@ restore:
 
 /* data文で与えられたデータを読み込む */
 read:
- read_p#, 8, + read_p#=
+ read_p#, 4, + read_p#=
  (read_p)#(-1), end
 
 
