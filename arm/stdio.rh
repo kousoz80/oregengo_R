@@ -11,6 +11,7 @@
  const ESC      27          /* ESCキーの文字コード */
  const NaN      0x80000000  /* ゼロ除算が発生したことをあらわす */
  const STACK_SIZE 8000
+ const FILE_SIZE 16
 
  /* 作業変数 */
  char  __fbuf$(512)  /* ファイル読み書き用のバッファ */
@@ -20,9 +21,16 @@
  long __t#,read_p# // data文へのポインタ
  long  __stack#(STACK_SIZE)
  long  __stack_top#
+ long  argc#,argv#
 
 /* プログラム開始位置 */
 _start:
+/ r0=sp/
+/ r2=&argc/
+/ (r2)#=r0/
+/ r0=r0+4/
+/ r2=&argv/
+/ (r2)#=r0/
 / sp=&__stack_top/
 
  main
@@ -141,7 +149,7 @@ _write:
 // 書き込みモードでファイルを開く
 wopen:
 / r1=&577/
-/ r2=&438/
+/ r2=&511/
 / jmp open/
 
 
@@ -152,8 +160,13 @@ ropen:
 
 // ファイルを開く
 open:
+/ sp=sp-4/
+/ (sp)#=r0/
 / r7=5/
 / svc 0/
+/ r8=(sp)#/
+/ sp=sp+4/
+/ (r8)#=r0/
   end
  
  
@@ -165,6 +178,14 @@ close:
 / svc 0/
   end
  
+
+// ファイルを削除する
+delete:
+/ r7=10/
+/ svc 0/
+  end
+
+
 /* 文字列を表示する */
 prints:
  1,
@@ -233,6 +254,19 @@ strcmp:
   __p1#, 1, + __p1#=
   __p2#, 1, + __p2#=
  goto __strcmp1
+
+
+// 文字数制限付きで文字列を比較する
+strncmp:
+ __p3#= pop __p2#= pop __p1#=
+ __strncmp1:
+  if __p3#<=0 then 0, end
+  if (__p1)$<>(__p2)$ then 1, end
+  if (__p1)$=NULL then 0, end
+  __p1#++
+  __p2#++
+  __p3#--
+ goto __strncmp1
 
 
 /* 文字列をコピーする */

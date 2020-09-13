@@ -10,7 +10,7 @@ main:
  
  char    buf$(256),xbuf$(256),infile$(FILE_SIZE),outfile$(FILE_SIZE)
  long    in_fname#,out_fname#,start_adrs#,blist#,prev_loc#
- count  i#,j#
+ count  i#,j#,nn#
  long    cmnt1#,cmnt2#,pc#,ofset#
  long    image_size#
 
@@ -18,9 +18,10 @@ main:
  NULL,  in_fname#= out_fname#=
  0x8054, start_adrs#=
  0, blist#=
- if argc#<2 then " command input error", prints nl end
- for i#=2 to argc#
-   argv-8#(i#), buf, strcpy
+ if (argc)#<2 then " command input error", prints nl end
+ (argc)#, 1, - nn#=
+ for i#=1 to nn#
+   (argv)#(i#), buf, strcpy
    buf, xbuf, strcpy
 
    // リストオプションの設定
@@ -318,9 +319,6 @@ ext_statement:
        // 先頭が "\'" 
        if (num)$=A_QUOT then (num)$(1), v#= gotoserch_next
 
-       // 先頭が "^" 
-       if (num)$='^' then num#, 1, + xval v#= gotoserch_next
-
        // 先頭が"0"
        if (num)$<>'0' goto decimal
        if (num)$(1)='b' then num#, 2, + 2,   atoi v#= gotoserch_next // 2進数
@@ -438,18 +436,9 @@ bit_copy:
 
 // 2のべき乗を求める
 power2:
-/ rax=0xff/
-/ rdi&=rax/
-/ rax=1/
-loop_pwr2:
-/ rdi&rdi/
-/ jz exit_pwr2/
-/ shl rax/
-/ rdi--/
-/ jmp loop_pwr2/
-exit_pwr2:
-/ rdi=rax/
- end
+/ r8=1/
+/ r0=r8<<r0/
+  end
 
 // シンボルを定義する
  const LEN_SYMBOL 256
@@ -592,10 +581,10 @@ def_ins:
  data 4,12,4,16,4,0
  data END
  data "\\1704=\\1704^\\1704",NORMAL,4
- data "0x00,9x00,0x20,0xe0
+ data 0x00,9x00,0x20,0xe0
  data  4,12,4,16,4,0
  data END
- data "\\1704=\\1704<<\\1704,NORMAL,4
+ data "\\1704=\\1704<<\\1704",NORMAL,4
  data 0x10,0x00,0xa0,0xe1
  data 4,12,4,0,4,8
  data END
@@ -631,7 +620,7 @@ def_ins:
  data 0x00,0x00,0x80,0xe3
  data 4,12,4,16,8,0
  data END
- data \\1704=\\1704^\\0708",NORMAL,4
+ data "\\1704=\\1704^\\0708",NORMAL,4
  data 0x00,0x00,0x20,0xe2
  data 4,12,4,16,8,0
  data END
@@ -758,7 +747,7 @@ def_ins:
  data 4,12,32,64
  data END
  data "\\1704=\\0708",NORMAL,4
- data 0x00,0x00",0xa0,0xe3
+ data 0x00,0x00,0xa0,0xe3
  data 4,12,8,0
  data END
  data "jmp \\0426",NORMAL,4

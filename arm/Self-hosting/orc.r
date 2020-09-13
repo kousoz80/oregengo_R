@@ -9,7 +9,7 @@
  long   infile#,outfile#,strfile#,varfile#,t#
 
 main:
- if argc#=1 goto abort
+ if (argc)#<2 goto abort
  "compile:", prints nl
  "asm.s",  asmfile, strcpy
  "__tmp1", infile#=
@@ -19,9 +19,9 @@ main:
 
  // 入力ファイルの結合
  infile#, wfp, wopen
- for i#=2 to argc#
-   argv-8#(i#), k#=
-   k#, cat_file j#=
+ (argc)#, 1, - k#=
+ for i#=1 to k#
+   (argv)#(i#),  cat_file j#=
    if j#=ERROR then wfp, wclose infile#, delete gotoabort
  next i#
  wfp, wclose
@@ -490,7 +490,7 @@ pass1:
 \4: memory 4
 \5: memory 4
 \6: memory 4
-
+"
   data " long \#,\#,\#,\#,\#"
   data " align 4
 \1: memory 4
