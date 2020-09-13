@@ -1,8 +1,13 @@
-// asm X64アセンブラ
+// asm ARMアセンブラ for android OS ver 0.1
+
 main:
- const IMAGE_BASE 22
- const IMAGE_SIZE  52
- const PROG_ADDR 42
+
+// const EFI_IMAGE_BASE 22
+// const EFI_IMAGE_SIZE  52
+// const EFI_PROG_ADDR 42
+   const ELF_MEM_SIZE 17
+   const ELF_FILE_SIZE 18
+ 
  char    buf$(256),xbuf$(256),infile$(FILE_SIZE),outfile$(FILE_SIZE)
  long    in_fname#,out_fname#,start_adrs#,blist#,prev_loc#
  count  i#,j#
@@ -11,7 +16,7 @@ main:
 
  // ファイル名・オプション設定
  NULL,  in_fname#= out_fname#=
- 0x4a8000, start_adrs#=
+ 0x8054, start_adrs#=
  0, blist#=
  if argc#<2 then " command input error", prints nl end
  for i#=2 to argc#
@@ -68,16 +73,19 @@ main:
  exit_pass1:
  infile, rclose
 
- // ヘッダにプログラム情報を書き込む
- start_adrs#, 0xffffffffff000000, and i#=
- start_adrs#, 0xffffff, and j#=
- i#, header#(IMAGE_BASE)=
- j#, header!(PROG_ADDR)=
- location#, start_adrs#, - image_size#= i#=
- image_size#, 4096, / 4096, * image_size#=
- if image_size#<i# then image_size#, 4096, + image_size#=
- image_size#, header!(IMAGE_SIZE)=
+// EFIヘッダにプログラム情報を書き込む
+// start_adrs#, 0xffffffffff000000, and i#=
+// start_adrs#, 0xffffff, and j#=
+// i#, header#(EFI_IMAGE_BASE)=
+// j#, header!(EFI_PROG_ADDR)=
+// location#, start_adrs#, - image_size#= i#=
+// image_size#, 4096, / 4096, * image_size#=
+// if image_size#<i# then image_size#, 4096, + image_size#=
+// image_size#, header!(EFI_IMAGE_SIZE)=
  
+// ELF ヘッダにメモリサイズ・ファイルサイズを書き込む 
+ location#, start_adrs#, - header!(ELF_MEM_SIZE)= header!(ELF_FILE_SIZE)=
+  
  // pass2: コードの生成
  2, pass#= 0, line#=
  start_adrs#, location#=
@@ -484,444 +492,327 @@ symbl_serch:
  .data
 
 // ファイルヘッダ
- const HEADER_SIZE 0x400
+ const HEADER_SIZE 84
 header:
- data 0x0000000300905a4d,0x0000ffff00000004,0x00000000000000b8,0x0000000000000040
- data 0x0000000000000000,0x0000000000000000,0x0000000000000000,0x0000008000000000
- data 0xcd09b4000eba1f0e,0x685421cd4c01b821,0x72676f7270207369,0x6f6e6e6163206d61
- data 0x6e75722065622074,0x20534f44206e6920,0x0a0d0d2e65646f6d,0x0000000000000024
- data 0x0001866400004550,0x00000000597f1ad0,0x022700f000000000,0x000002001902020b
- data 0x0000000000000000,0x0000100000001000,0x0000000000400000,0x0000020000001000
- data 0x0000000000000004,0x0000000000020005,0x0000040000006000,0x0000000a00000000
- data 0x0000000000200000,0x0000000000001000,0x0000000000100000,0x0000000000001000
- data 0x0000001000000000,0x0000000000000000,0x0000000000005000,0x0000000000000000
- data 0x0000000000003000,0x0000000000000000,0x0000000000000000,0x0000000000000000
- data 0x0000000000000000,0x0000000000000000,0x0000000000000000,0x0000000000000000
- data 0x0000000000000000,0x0000000000000000,0x0000000000000000,0x0000000000000000
- data 0x0000000000000000,0x000000747865742e,0x0000100000000070,0x0000040000000200
- data 0x0000000000000000,0xe050002000000000,0x000061746164722e,0x0000200000000040
- data 0x0000060000000200,0x0000000000000000,0x4050004000000000,0x000061746164702e
- data 0x000030000000000c,0x0000080000000200,0x0000000000000000,0x4030004000000000
- data 0x000061746164782e,0x000040000000000c,0x00000a0000000200,0x0000000000000000
- data 0x4030004000000000,0x000061746164692e,0x0000500000000014,0x00000c0000000200
- data 0x0000000000000000,0xc030004000000000,0x0000000000000000,0x0000000000000000
- data 0x0000000000000000,0x0000000000000000,0x0000000000000000,0x0000000000000000
- data 0x0000000000000000,0x0000000000000000,0x0000000000000000,0x0000000000000000
- data 0x0000000000000000,0x0000000000000000,0x0000000000000000,0x0000000000000000
- data 0x0000000000000000,0x0000000000000000,0x0000000000000000,0x0000000000000000
- data 0x0000000000000000,0x0000000000000000,0x0000000000000000,0x0000000000000000
- data 0x0000000000000000,0x0000000000000000,0x0000000000000000,0x0000000000000000
- data 0x0000000000000000,0x0000000000000000,0x0000000000000000,0x0000000000000000
- data 0x0000000000000000,0x0000000000000000,0x0000000000000000,0x0000000000000000
- data 0x0000000000000000,0x0000000000000000,0x0000000000000000,0x0000000000000000
- data 0x0000000000000000,0x0000000000000000,0x0000000000000000,0x0000000000000000
- data 0x0000000000000000,0x0000000000000000,0x0000000000000000,0x0000000000000000
- data 0x0000000000000000,0x0000000000000000,0x0000000000000000,0x0000000000000000
- data 0x0000000000000000,0x0000000000000000,0x0000000000000000,0x0000000000000000
- 
+ data 0x464c457f,0x00010101,0x00000000,0x00000000 
+ data 0x00280002,0x00000001,0x00008054,0x00000034 
+ data 0x00000160,0x05000000,0x00200034,0x00280001 
+ data 0x00030006,0x00000001,0x00000000,0x00008000 
+ data 0x00008000,0x00000110,0x00000110,0x00000005 
+ data 0x00008000
  
 // アセンブラデータ
 paramater:
-  data "/*","//","$",0
+  data "/*","//","$",-8
 
 // レジスタの定義データ
 symbols:
- data "rax",0,17
- data "rcx",1,17
- data "rdx",2,17
- data "rbx",3,17
- data "rsp",4,17
- data "rbp",5,17
- data "rsi",6,17
- data "rdi",7,17
- data "r8",0,19
- data "r9",1,19
- data "r10",2,19
- data "r11",3,19
- data "r12",4,19
- data "r13",5,19
- data "r14",6,19
- data "r15",7,19
- data "eax",0,21
- data "ecx",1,21
- data "edx",2,21
- data "ebx",3,21
- data "ax",0,23
- data "cx",1,23
- data "dx",2,23
- data "bx",3,23
- data "al",0,25
- data "cl",1,25
- data "dl",2,25
- data "bl",3,25
- data "xmm0",0,27
- data "xmm1",1,27
- data "xmm2",2,27
- data "xmm3",3,27
- data "xmm4",4,27
- data "xmm5",5,27
- data "xmm6",6,27
- data "xmm7",7,27
+ data "r0",0,17
+ data "r1",1,17
+ data "r2",2,17
+ data "r3",3,17
+ data "r4",4,17
+ data "r5",5,17
+ data "r6",6,17
+ data "r7",7,17
+ data "r8",8,17
+ data "r9",9,17
+ data "r10",10,17
+ data "r11",11,17
+ data "r12",12,17
+ data "r13",13,17
+ data "r14",14,17
+ data "r15",15,17
+ data "a1",0,17
+ data "a2",1,17
+ data "a3",2,17
+ data "a4",3,17
+ data "v1",4,17
+ data "v2",5,17
+ data "v3",6,17
+ data "v4",7,17
+ data "v5",8,17
+ data "v6",9,17
+ data "v7",10,17
+ data "v8",11,17
+ data "ip",12,17
+ data "sp",13,17
+ data "lr",14,17
+ data "pc",15,17
+ data "wr",7,17
+ data "sb",9,17
+ data "sl",10,17
+ data "fp",11,17
  data NULL
 
 // 命令定義データ
 def_ins:
- data "org \0664",ORG,0
+ data "org \0632",ORG,0
  data END
- data "equ \0664",EQU,0
+ data "equ \0632",EQU,0
  data END
- data "= \0664",EQU,0
+ data "= \0632",EQU,0
  data END
- data "+= \0664",EQU_PP,0
+ data "+= \0632",EQU_PP,0
  data END
- data "memory \0264",MEMORY,0
+ data "memory \0232",MEMORY,0
  data END
- data "align \0664",ALIGN,0
+ data "align \0632",ALIGN,0
  data END
- data "byte \0664",NORMAL,1
- data 0,8,0,END
- data "short \0664",NORMAL,2
- data 0,0,16,0,END
- data "int \0664",NORMAL,4
- data 0,0,0,0,32,0,END
- data "long \0664",NORMAL,8
- data 0,0,0,0,0,0,0,0
- data 64,0,END
- data "syscall",NORMAL,2
- data 15,5,END
- data "jmp (\1703)",NORMAL,2
- data 255,224,3,8,END
- data "jmp \0464",NORMAL,5
- data 233,0,0,0,0,32,8,END
- data "call (\1703)",NORMAL,2
- data 255,208,3,8,END
- data "call \0464",NORMAL,5
- data 232,0,0,0,0,32,8,END
- data "ret",NORMAL,1
- data 195,END
- data "jc \0464",NORMAL,6
- data 15,130,0,0,0,0,32,16
+ data "byte \0632",NORMAL,1
+ data 0
+ data 8,0
  data END
- data "jnc \0464",NORMAL,6
- data 15,131,0,0,0,0,32,16
+ data "short \0632",NORMAL,2
+ data 0,0
+ data 16,0
  data END
- data "jz \0464",NORMAL,6
- data 15,132,0,0,0,0,32,16
+ data "int \0632",NORMAL,4
+ data 0,0,0,0
+ data 32,0
  data END
- data "jnz \0464",NORMAL,6
- data 15,133,0,0,0,0,32,16
+ data "long \0632",NORMAL,4
+ data 0,0,0,0
+ data 32,0
  data END
- data "jlt \0464",NORMAL,6
- data 15,140,0,0,0,0,32,16
+ data "\\1704=\\1704+\\1704",NORMAL,4
+ data 0x00,0x00,0x80,0xe0
+ data 4,12,4,16,4,0
  data END
- data "jle \0464",NORMAL,6
- data 15,142,0,0,0,0,32,16
+ data "\\1704=\\1704-\\1704",NORMAL,4
+ data 0x00,0x00,0x40,0xe0
+ data 4,12,4,16,4,0
  data END
- data "jgt \0464",NORMAL,6
- data 15,143,0,0,0,0,32,16
+ data "\\1704=\\1704&\\1704",NORMAL,4
+ data 0x00,0x00,0x00,0xe0
+ data 4,12,4,16,4,0
  data END
- data "jge \0464",NORMAL,6
- data 15,141,0,0,0,0,32,16
+ data "\\1704=\\1704|\\1704",NORMAL,4
+ data 0x00,0x00,0x80,0xe1
+ data 4,12,4,16,4,0
  data END
- data "ja \0464",NORMAL,6
- data 15,135,0,0,0,0,32,16
+ data "\\1704=\\1704^\\1704",NORMAL,4
+ data "0x00,9x00,0x20,0xe0
+ data  4,12,4,16,4,0
  data END
- data "jae \0464",NORMAL,6
- data 15,131,0,0,0,0,32,16
+ data "\\1704=\\1704<<\\1704,NORMAL,4
+ data 0x10,0x00,0xa0,0xe1
+ data 4,12,4,0,4,8
  data END
- data "jb \0464",NORMAL,6
- data 15,130,0,0,0,0,32,16
+ data "\\1704=\\1704>>\\1704",NORMAL,4
+ data 0x30,0x00,0xa0,0xe1
+ data 4,12,4,0,4,8
  data END
- data "jbe \0464",NORMAL,6
- data 15,134,0,0,0,0,32,16
+ data "\\1704=\\1704*\\1704",NORMAL,4
+ data 0x90,0x00,0x00,0xe0
+ data 4,16,4,0,4,8
  data END
- data "shl \1703",NORMAL,3
- data 72,209,224,3,16,END
- data "shl \1903",NORMAL,3
- data 73,209,224,3,16,END
- data "shr \1703",NORMAL,3
- data 72,209,232,3,16,END
- data "shr \1903",NORMAL,3
- data 73,209,232,3,16,END
- data "sar \1703",NORMAL,3
- data 72,209,248,3,16,END
- data "sar \1903",NORMAL,3
- data 73,209,248,3,16,END
- data "rol \1703",NORMAL,3
- data 72,209,192,3,16,END
- data "rol \1903",NORMAL,3
- data 73,209,192,3,16,END
- data "rcl \1703",NORMAL,3
- data 72,209,208,3,16,END
- data "rcl \1903",NORMAL,3
- data 73,209,208,3,16,END
- data "ror \1703",NORMAL,3
- data 72,209,200,3,16,END
- data "ror \1903",NORMAL,3
- data 73,209,200,3,16,END
- data "rcr \1703",NORMAL,3
- data 72,209,216,3,16,END
- data "rcr \1903",NORMAL,3
- data 73,209,216,3,16,END
- data "neg \1703",NORMAL,3
- data 72,247,216,3,16,END
- data "neg \1903",NORMAL,3
- data 73,247,216,3,16,END
- data "not \1703",NORMAL,3
- data 72,247,208,3,16,END
- data "not \1903",NORMAL,3
- data 73,247,208,3,16,END
- data "push \1703",NORMAL,1
- data 80,3,0,END
- data "push \1903",NORMAL,2
- data 65,80,3,8,END
- data "pop \1703",NORMAL,1
- data 88,3,0,END
- data "pop \1903",NORMAL,2
- data 65,88,3,8,END
- data "\1703++",NORMAL,3
- data 72,255,192,3,16,END
- data "\1903++",NORMAL,3
- data 73,255,192,3,16,END
- data "\2103++",NORMAL,2
- data 255,192,3,8,END
- data "\2303++",NORMAL,3
- data 102,255,192,3,16,END
- data "\2503++",NORMAL,2
- data 254,192,3,8,END
- data "\1703--",NORMAL,3
- data 72,255,200,3,16,END
- data "\1903--",NORMAL,3
- data 73,255,200,3,16,END
- data "\2103--",NORMAL,2
- data 255,200,3,8,END
- data "\2303--",NORMAL,3
- data 102,255,200,3,16,END
- data "\2503--",NORMAL,2
- data 254,200,3,8,END
- data "\2703.+=\2703",NORMAL,4
- data 242,15,88,192,3,27,3,24
+ data "\\1704-\\1704",NORMAL,4
+ data 0x00,0x00,0x50,0xe1
+ data 4,16,4,0
  data END
- data "\2703.-=\2703",NORMAL,4
- data 242,15,92,192,3,27,3,24
+ data "\\1704&\\1704",NORMAL,4
+ data 0x00,0x00,0x10,0xe1
+ data 4,16,4,0
  data END
- data "\2703.*=\2703",NORMAL,4
- data 242,15,89,192,3,27,3,24
+ data "\\1704=\\1704+\\0708",NORMAL,4
+ data 0x00,0x00,0x80,0xe2
+ data 4,12,4,16,8,0
  data END
- data "\2703./=\2703",NORMAL,4
- data 242,15,94,192,3,27,3,24
+ data "\\1704=\\1704-\\0708",NORMAL,4
+ data 0x00,0x00,0x40,0xe2
+ data 4,12,4,16,8,0
  data END
- data "\2703=sqrt(\2703)",NORMAL,4
- data 242,15,81,192,3,27,3,24
+ data "\\1704=\\1704&\\0708",NORMAL,4
+ data 0x00,0x00,0x00,0xe2
+ data 4,12,4,16,8,0
  data END
- data "\2703.-\2703",NORMAL,4
- data 102,15,47,192,3,27,3,24
+ data "\\1704=\\1704|\\0708",NORMAL,4
+ data 0x00,0x00,0x80,0xe3
+ data 4,12,4,16,8,0
  data END
- data "\2703=(double)\1703",NORMAL,5
- data 242,72,15,42,192,3,35,3
- data 32,END
- data "\1703=(_long)\2703",NORMAL,5
- data 242,72,15,44,192,3,35,3
- data 32,END
- data "\1703=(long)\2703",NORMAL,5
- data 242,72,15,45,192,3,35,3
- data 32,END
- data "exg rax,\1703",NORMAL,2
- data 72,144,3,8,END
- data "exg \1703,rax",NORMAL,2
- data 72,144,3,8,END
- data "exg rax,\1903",NORMAL,2
- data 73,144,3,8,END
- data "exg \1903,rax",NORMAL,2
- data 73,144,3,8,END
- data "exg \1703,\1703",NORMAL,3
- data 72,135,192,3,16,3,19,END
- data "exg \1903,\1903",NORMAL,3
- data 77,135,192,3,16,3,19,END
- data "exg \1703,\1903",NORMAL,3
- data 76,135,192,3,16,3,19,END
- data "exg \1903,\1703",NORMAL,3
- data 73,135,192,3,16,3,19,END
- data "\1703+=\1703",NORMAL,3
- data 72,1,192,3,16,3,19,END
- data "\1903+=\1903",NORMAL,3
- data 77,1,192,3,16,3,19,END
- data "\1703+=\1903",NORMAL,3
- data 76,1,192,3,16,3,19,END
- data "\1903+=\1703",NORMAL,3
- data 73,1,192,3,16,3,19,END
- data "\1703-=\1703",NORMAL,3
- data 72,41,192,3,16,3,19,END
- data "\1903-=\1903",NORMAL,3
- data 77,41,192,3,16,3,19,END
- data "\1703-=\1903",NORMAL,3
- data 76,41,192,3,16,3,19,END
- data "\1903-=\1703",NORMAL,3
- data 73,41,192,3,16,3,19,END
- data "\1703+=\1703",NORMAL,3
- data 72,1,192,3,16,3,19,END
- data "\1903+=\1903",NORMAL,3
- data 77,1,192,3,16,3,19,END
- data "\1703+=\1903",NORMAL,3
- data 76,1,192,3,16,3,19,END
- data "\1903+=\1703",NORMAL,3
- data 73,1,192,3,16,3,19,END
- data "\1703-=\1703",NORMAL,3
- data 72,41,192,3,16,3,19,END
- data "\1903-=\1903",NORMAL,3
- data 77,41,192,3,16,3,19,END
- data "\1703-=\1903",NORMAL,3
- data 76,41,192,3,16,3,19,END
- data "\1903-=\1703",NORMAL,3
- data 73,41,192,3,16,3,19,END
- data "\1703&=\1703",NORMAL,3
- data 72,33,192,3,16,3,19,END
- data "\1903&=\1903",NORMAL,3
- data 77,33,192,3,16,3,19,END
- data "\1703&=\1903",NORMAL,3
- data 76,33,192,3,16,3,19,END
- data "\1903&=\1703",NORMAL,3
- data 73,33,192,3,16,3,19,END
- data "\1703|=\1703",NORMAL,3
- data 72,9,192,3,16,3,19,END
- data "\1903|=\1903",NORMAL,3
- data 77,9,192,3,16,3,19,END
- data "\1703|=\1903",NORMAL,3
- data 76,9,192,3,16,3,19,END
- data "\1903|=\1703",NORMAL,3
- data 73,9,192,3,16,3,19,END
- data "\1703^=\1703",NORMAL,3
- data 72,49,192,3,16,3,19,END
- data "\1903^=\1903",NORMAL,3
- data 77,49,192,3,16,3,19,END
- data "\1703^=\1903",NORMAL,3
- data 76,49,192,3,16,3,19,END
- data "\1903^=\1703",NORMAL,3
- data 73,49,192,3,16,3,19,END
- data "\1703-\1703",NORMAL,3
- data 72,57,192,3,16,3,19,END
- data "\1903-\1903",NORMAL,3
- data 77,57,192,3,16,3,19,END
- data "\1703-\1903",NORMAL,3
- data 76,57,192,3,16,3,19,END
- data "\1903-\1703",NORMAL,3
- data 73,57,192,3,16,3,19,END
- data "\1703&\1703",NORMAL,3
- data 72,133,192,3,16,3,19,END
- data "\1903&\1903",NORMAL,3
- data 77,133,192,3,16,3,19,END
- data "\1703&\1903",NORMAL,3
- data 76,133,192,3,16,3,19,END
- data "\1903&\1703",NORMAL,3
- data 73,133,192,3,16,3,19,END
- data "\1703=\0632(rsp)",NORMAL,8
- data 72,139,132,36,0,0,0,0
- data 3,19,32,32,END
- data "\1703=\0632(\1703)",NORMAL,7
- data 72,139,128,0,0,0,0,3
- data 19,32,24,3,16,END
- data "\1703=(\1703)",NORMAL,3
- data 72,139,0,3,19,3,16,END
- data "\0632(rsp)=\1703",NORMAL,8
- data 72,137,132,36,0,0,0,0
- data 32,32,3,19,END
- data "\0632(\1703)=\1703",NORMAL,7
- data 72,137,128,0,0,0,0,32
- data 24,3,16,3,19,END
- data "(\1703)=\1703",NORMAL,3
- data 72,137,0,3,16,3,19,END
- data "\1903=\0632(rsp)",NORMAL,8
- data 76,139,132,36,0,0,0,0
- data 3,19,32,32,END
- data "\1903=\0632(\1703)",NORMAL,7
- data 76,139,128,0,0,0,0,3
- data 19,32,24,3,16,END
- data "\1903=(\1703)",NORMAL,3
- data 76,139,0,3,19,3,16,END
- data "\0632(rsp)=\1903",NORMAL,8
- data 76,137,132,36,0,0,0,0
- data 32,32,3,19,END
- data "\0632(\1703)=\1903",NORMAL,7
- data 76,137,128,0,0,0,0,32
- data 24,3,16,3,19,END
- data "(\1703)=\1903",NORMAL,3
- data 76,137,0,3,16,3,19,END
- data "\2103=(\1703)",NORMAL,2
- data 139,0,3,11,3,8,END
- data "(\1703)=\2103",NORMAL,2
- data 137,0,3,8,3,11,END
- data "\2303=(\1703)",NORMAL,3
- data 102,139,0,3,19,3,16,END
- data "(\1703)=\2303",NORMAL,3
- data 102,137,0,3,16,3,19,END
- data "\2503=(\1703)",NORMAL,2
- data 138,0,3,11,3,8,END
- data "(\1703)=\2503",NORMAL,2
- data 136,0,3,8,3,11,END
- data "\2703=\1703",NORMAL,5
- data 102,72,15,110,192,3,35,3
- data 32,END
- data "\1703=\2703",NORMAL,5
- data 102,72,15,126,192,3,32,3
- data 35,END
- data "\1703=\1703",NORMAL,3
- data 72,137,192,3,16,3,19,END
- data "\1903=\1903",NORMAL,3
- data 77,137,192,3,16,3,19,END
- data "\1703=\1903",NORMAL,3
- data 76,137,192,3,16,3,19,END
- data "\1903=\1703",NORMAL,3
- data 73,137,192,3,16,3,19,END
- data "\1703=&\0664(rip)",NORMAL,7
- data 72,141,5,0,0,0,0,3
- data 19,32,24,END
- data "\1703=&\0664",NORMAL,8
- data 72,141,4,37,0,0,0,0
- data 3,19,32,32,END
- data "\1703=\0664",NORMAL,10
- data 72,184,0,0,0,0,0,0
- data 0,0,3,8,64,16,END
- data "\1903=\0664",NORMAL,10
- data 73,184,0,0,0,0,0,0
- data 0,0,3,8,64,16,END
- data "umul \1703",NORMAL,3
- data 72,247,224,3,16,END
- data "umul \1903",NORMAL,3
- data 73,247,224,3,16,END
- data "mul \1703",NORMAL,3
- data 72,247,232,3,16,END
- data "mul \1903",NORMAL,3
- data 73,247,232,3,16,END
- data "udiv \1703",NORMAL,3
- data 72,247,240,3,16,END
- data "udiv \1903",NORMAL,3
- data 73,247,240,3,16,END
- data "div \1703",NORMAL,3
- data 72,247,248,3,16,END
- data "div \1903",NORMAL,3
- data 73,247,248,3,16,END
- data "in al,(dx)",NORMAL,1
- data 236,END
- data "in ax,(dx)",NORMAL,2
- data 102,237,END
- data "in eax,(dx)",NORMAL,1
- data 237,END
- data "out (dx),al",NORMAL,1
- data 238,END
- data "out (dx),ax",NORMAL,2
- data 102,239,END
- data "out (dx),eax",NORMAL,1
- data 239,END
- data "ext al",NORMAL,4
- data 72,15,182,192,END
- data "ext ax",NORMAL,4
- data 72,15,183,192,END
- data "ext eax",NORMAL,2
- data 72,152,END
- data "cli",NORMAL,1
- data 250,END
- data "sti",NORMAL,1
- data 251,END
- data "nop",NORMAL,1
- data 144,END
+ data \\1704=\\1704^\\0708",NORMAL,4
+ data 0x00,0x00,0x20,0xe2
+ data 4,12,4,16,8,0
+ data END
+ data "\\1704=\\1704<<\\0705",NORMAL,4
+ data 0x00,0x00,0xa0,0xe1
+ data 4,12,4,0,5,7
+ data END
+ data "\\1704=\\1704>>\\0705",NORMAL,4
+ data 0x20,0x00,0xa0,0xe1
+ data 4,12,4,0,5,7
+ data END
+ data "\\1704-\\0708",NORMAL,4
+ data 0x00,0x00,0x50,0xe3
+ data 4,16,8,0
+ data END
+ data "\\1704&\\0708",NORMAL,4
+ data 0x00,0x00,0x10,0xe3
+ data 4,16,8,0
+ data END
+ data "\\1704=(\\1704+\\1704)#",NORMAL,4
+ data 0x00,0x00,0x90,0xe7
+ data 4,12,4,16,4,0
+ data END
+ data "\\1704=(\\1704+\\0708)#",NORMAL,4
+ data 0x00,0x00,0x90,0xe5
+ data 4,12,4,16,8,0
+ data END
+ data "\\1704=(\\1704)#",NORMAL,4
+ data 0x00,0x00,0x90,0xe5
+ data 4,12,4,16
+ data END
+ data "\\1704=(\\1704+\\1704)!",NORMAL,4
+ data 0x00,0x00,0x90,0xe7
+ data 4,12,4,16,4,0
+ data END
+ data "\\1704=(\\1704+\\0708)!",NORMAL,4
+ data 0x00,0x00,0x90,0xe5
+ data 4,12,4,16,8,0
+ data END
+ data "\\1704=(\\1704)!",NORMAL,4
+ data 0x00,0x00,0x90,0xe5
+ data 4,12,4,16
+ data END
+ data "\\1704=(\\1704+\\1704)%",NORMAL,4
+ data 0x00,0x00,0x90,0xe1
+ data 4,12,4,16,4,0
+ data END
+ data "\\1704=(\\1704+\\0708)%",NORMAL,4
+ data 0x00,0x00,0xd0,0xe1
+ data 4,12,4,16,8,0
+ data END
+ data "\\1704=(\\1704)%",NORMAL,4
+ data 0x00,0x00,0xd0,0xe1
+ data 4,12,4,16
+ data END
+ data "\\1704=(\\1704+\\1704)$",NORMAL,4
+ data 0x00,0x00,0xd0,0xe7
+ data 4,12,4,16,4,0
+ data END
+ data "\\1704=(\\1704+\\0708)$",NORMAL,4
+ data 0x00,0x00,0xd0,0xe5
+ data 4,12,4,16,8,0
+ data END
+ data "\\1704=(\\1704)$",NORMAL,4
+ data 0x00,0x00,0xd0,0xe5
+ data 4,12,4,16
+ data END
+ data "(\\1704+\\1704)#=\\1704",NORMAL,4
+ data 0x00,0x00,0x80,0xe7
+ data 4,16,4,0,4,12
+ data END
+ data "(\\1704+\\0708)#=\\1704",NORMAL,4
+ data 0x00,0x00,0x80,0xe5
+ data 4,16,8,0,4,12
+ data END
+ data "(\\1704)#=\\1704",NORMAL,4
+ data 0x00,0x00,0x80,0xe5
+ data 4,16,4,12
+ data END
+ data "(\\1704+\\1704)!=\\1704",NORMAL,4
+ data 0x00,0x00,0x80,0xe7
+ data 4,16,4,0,4,12
+ data END
+ data "(\\1704+\\0708)!=\\1704",NORMAL,4
+ data 0x00,0x00,0x80,0xe5
+ data 4,16,8,0,4,12
+ data END
+ data "(\\1704)!=\\1704",NORMAL,4
+ data 0x00,0x00,0x80,0xe5
+ data 4,16,4,12
+ data END
+ data "(\\1704+\\1704)%=\\1704",NORMAL,4
+ data 0x00,0x00,0x80,0xe1
+ data 4,16,4,0,4,12
+ data END
+ data "(\\1704+\\0708)%=\\1704",NORMAL,4
+ data 0x00,0x00,0xc0,0xe1
+ data 4,16,8,0,4,12
+ data END
+ data "(\\1704)%=\\1704",NORMAL,4
+ data 0x00,0x00,0xc0,0xe1
+ data 4,16,4,12
+ data END
+ data "(\\1704+\\1704)$=\\1704",NORMAL,4
+ data 0x00,0x00,0xc0,0xe7
+ data 4,16,4,0,4,12
+ data END
+ data "(\\1704+\\0708)$=\\1704",NORMAL,4
+ data 0x00,0x00,0xc0,0xe5
+ data 4,16,8,0,4,12
+ data END
+ data "(\\1704)$=\\1704",NORMAL,4
+ data 0x00,0x00,0xc0,0xe5
+ data 4,16,4,12
+ data END
+ data "\\1704=\\1704",NORMAL,4
+ data 0x00,0x00,0xa0,0xe1
+ data 4,12,4,0
+ data END
+ data "\\1704=&\\0632",NORMAL,12
+ data 0x00,0x00,0x9f,0xe5
+ data 0x00,0x00,0x00,0xea
+ data 0x00,0x00,0x00,0x00
+ data 4,12,32,64
+ data END
+ data "\\1704=\\0708",NORMAL,4
+ data 0x00,0x00",0xa0,0xe3
+ data 4,12,8,0
+ data END
+ data "jmp \\0426",NORMAL,4
+ data 0x00,0x00,0x00,0xea
+ data 2,120,24,0
+ data END
+ data "jeq \\0426",NORMAL,4
+ data 0x00,0x00,0x00,0x0a
+ data 2,120,24,0
+ data END
+ data "jne \\0426",NORMAL,4
+ data 0x00,0x00,0x00,0x1a
+ data 2,120,24,0
+ data END
+ data "jpl \\0426",NORMAL,4
+ data 0x00,0x00,0x00,0x5a
+ data 2,120,24,0
+ data END
+ data "jmi \\0426",NORMAL,4
+ data 0x00,0x00,0x00,0x4a
+ data 2,120,24,0
+ data END
+ data "jge \\0426",NORMAL,4
+ data 0x00,0x00,0x00,0xaa
+ data 2,120,24,0
+ data END
+ data "jgt \\0426",NORMAL,4
+ data 0x00,0x00,0x00,0xca
+ data 2,120,24,0
+ data END
+ data "jlt \\0426",NORMAL,4
+ data 0x00,0x00,0x00,0xba
+ data 2,120,24,0
+ data END
+ data "jle \\0426",NORMAL,4
+ data 0x00,0x00,0x00,0xda
+ data 2,120,24,0
+ data END
+ data "call \\0426",NORMAL,4
+ data 0x00,0x00,0x00,0xeb
+ data 2,120,24,0
+ data END
+ data "ret",NORMAL,4
+ data 0x0e,0xf0,0xa0,0xe1
+ data END
+ data "clz \\1704,\\1704",NORMAL,4
+ data 0x10,0x0f,0x6f,0xe1
+ data 4,12,4,0
+ data END
+ data "svc \\0724",NORMAL,4
+ data 0x00,0x00,0x00,0xef
+ data 24,0
+ data END
+ data "nop",NORMAL,4
+ data 0x00,0x00,0xa0,0xe1
+ data END
  data NULL

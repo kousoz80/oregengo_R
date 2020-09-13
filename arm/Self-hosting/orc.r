@@ -440,111 +440,111 @@ ref_data:
 /* パス１定義データ （宣言文の定義）*/
 pass1:
   data " long \#(\),\#(\),\#(\),\#(\)"
-  data " align 8
-\1: memory \2*8
-\3: memory \4*8
-\5: memory \6*8
-\7: memory \8*8
+  data " align 4
+\1: memory \2*4
+\3: memory \4*4
+\5: memory \6*4
+\7: memory \8*4
 "
  data " long \#(\),\#(\),\#(\)"
- data " align 8
-\1: memory \2*8
-\3: memory \4*8
-\5: memory \6*8
+ data " align 4
+\1: memory \2*4
+\3: memory \4*4
+\5: memory \6*4
 "
   data  " long \#(\),\#(\)"
-  data  " align 8
-\1: memory \2*8
-\3: memory \4*8
+  data  " align 4
+\1: memory \2*4
+\3: memory \4*4
 "
   data  " long \#(\)"
-  data  " align 8
-\1: memory \2*8
+  data  " align 4
+\1: memory \2*4
 "
  data " long \#,\#,\#,\#,\#,\#,\#,\#"
- data " align 8
-\1: memory 8
-\2: memory 8
-\3: memory 8
-\4: memory 8
-\5: memory 8
-\6: memory 8
-\7: memory 8
-\8: memory 8
+ data " align 4
+\1: memory 4
+\2: memory 4
+\3: memory 4
+\4: memory 4
+\5: memory 4
+\6: memory 4
+\7: memory 4
+\8: memory 4
 "
  data " long \#,\#,\#,\#,\#,\#,\#"
- data " align 8
-\1: memory 8
-\2: memory 8
-\3: memory 8
-\4: memory 8
-\5: memory 8
-\6: memory 8
-\7: memory 8
+ data " align 4
+\1: memory 4
+\2: memory 4
+\3: memory 4
+\4: memory 4
+\5: memory 4
+\6: memory 4
+\7: memory 4
 "
  data " long \#,\#,\#,\#,\#,\#"
- data " align 8
-\1: memory 8
-\2: memory 8
-\3: memory 8
-\4: memory 8
-\5: memory 8
-\6: memory 8
-"
+ data " align 4
+\1: memory 4
+\2: memory 4
+\3: memory 4
+\4: memory 4
+\5: memory 4
+\6: memory 4
+
   data " long \#,\#,\#,\#,\#"
-  data " align 8
-\1: memory 8
-\2: memory 8
-\3: memory 8
-\4: memory 8
-\5: memory 8
+  data " align 4
+\1: memory 4
+\2: memory 4
+\3: memory 4
+\4: memory 4
+\5: memory 4
 "
  data " long \#,\#,\#,\#"
- data " align 8
-\1: memory 8
-\2: memory 8
-\3: memory 8
-\4: memory 8
+ data " align 4
+\1: memory 4
+\2: memory 4
+\3: memory 4
+\4: memory 4
 "
  data " long \#,\#,\#"
- data " align 8
-\1: memory 8
-\2: memory 8
-\3: memory 8
+ data " align 4
+\1: memory 4
+\2: memory 4
+\3: memory 4
   "
  data " long \#,\#"
- data " align 8
-\1: memory 8
-\2: memory 8
+ data " align 4
+\1: memory 4
+\2: memory 4
 "
  data " long \#"
- data " align 8
-\1: memory 8
+ data " align 4
+\1: memory 4
 "
  data " int \!(\),\!(\),\!(\),\!(\)"
- data " align 8
+ data " align 4
 \1: memory \2*4
 \3: memory \4*4
 \5: memory \6*4
 \7: memory \8*4
 "
  data " int \!(\),\!(\),\!(\)"
- data " align 8
+ data " align 4
 \1: memory \2*4
 \3: memory \4*4
 \5: memory \6*4
 "
  data " int \!(\),\!(\)"
- data " align 8
+ data " align 4
 \1: memory \2*4
 \3: memory \4*4
 "
  data " int \!(\)"
- data " align 8
+ data " align 4
 \1: memory \2*4
 "
  data " int \!,\!,\!,\!,\!,\!,\!,\!"
- data " align 8
+ data " align 4
 \1: memory 4
 \2: memory 4
 \3: memory 4
@@ -555,7 +555,7 @@ pass1:
 \8: memory 4
 "
  data " int \!,\!,\!,\!,\!,\!,\!"
- data " align 8
+ data " align 4
 \1: memory 4
 \2: memory 4
 \3: memory 4
@@ -565,7 +565,7 @@ pass1:
 \7: memory 4
 "
  data " int \!,\!,\!,\!,\!,\!"
- data " align 8
+ data " align 4
 \1: memory 4
 \2: memory 4
 \3: memory 4
@@ -574,7 +574,7 @@ pass1:
 \6: memory 4
 "
  data " int \!,\!,\!,\!,\!"
- data " align 8
+ data " align 4
 \1: memory 4
 \2: memory 4
 \3: memory 4
@@ -582,51 +582,51 @@ pass1:
 \5: memory 4
 "
  data " int \!,\!,\!,\!"
- data " align 8
+ data " align 4
 \1: memory 4
 \2: memory 4
 \3: memory 4
 \4: memory 4
 "
  data " int \!,\!,\!"
- data " align 8
+ data " align 4
 \1: memory 4
 \2: memory 4
 \3: memory 4
 "
  data " int \!,\!"
- data " align 8
+ data " align 4
 \1: memory 4
 \2: memory 4
 "
  data " int \!"
- data " align 8
+ data " align 4
 \1: memory 4
 "
  data " short \%(\),\%(\),\%(\),\%(\)"
- data " align 8
+ data " align 4
 \1: memory \2*2
 \3: memory \4*2
 \5: memory \6*2
 \7: memory \8*2
 "
  data " short \%(\),\%(\),\%(\)"
- data " align 8
+ data " align 4
 \1: memory \2*2
 \3: memory \4*2
 \5: memory \6*2
 "
  data " short \%(\),\%(\)"
- data " align 8
+ data " align 4
 \1: memory \2*2
 \3: memory \4*2
 "
  data " short \%(\)"
- data " align 8
+ data " align 4
 \1: memory \2*2
 "
  data " short \%,\%,\%,\%,\%,\%,\%,\%"
- data " align 8
+ data " align 4
 \1: memory 2
 \2: memory 2
 \3: memory 2
@@ -637,7 +637,7 @@ pass1:
 \8: memory 2
 "
  data " short \%,\%,\%,\%,\%,\%,\%"
- data " align 8
+ data " align 4
 \1: memory 2
 \2: memory 2
 \3: memory 2
@@ -647,7 +647,7 @@ pass1:
 \7: memory 2
 "
  data " short \%,\%,\%,\%,\%,\%"
- data " align 8
+ data " align 4
 \1: memory 2
 \2: memory 2
 \3: memory 2
@@ -656,7 +656,7 @@ pass1:
 \6: memory 2
 "
  data " short \%,\%,\%,\%,\%"
- data " align 8
+ data " align 4
 \1: memory 2
 \2: memory 2
 \3: memory 2
@@ -664,51 +664,51 @@ pass1:
 \5: memory 2
 "
  data " short \%,\%,\%,\%"
- data " align 8
+ data " align 4
 \1: memory 2
 \2: memory 2
 \3: memory 2
 \4: memory 2
 "
  data " short \%,\%,\%"
- data " align 8
+ data " align 4
 \1: memory 2
 \2: memory 2
 \3: memory 2
 "
  data " short \%,\%"
- data " align 8
+ data " align 4
 \1: memory 2
 \2: memory 2
 "
  data " short \%"
- data " align 8
+ data " align 4
 \1: memory 2
 "
  data " char \$(\),\$(\),\$(\),\$(\)"
- data " align 8
+ data " align 4
 \1: memory \2
 \3: memory \4
 \5: memory \6
 \7: memory \8
 "
  data " char \$(\),\$(\),\$(\)"
- data " align 8
+ data " align 4
 \1: memory \2
 \3: memory \4
 \5: memory \6
 "
  data " char \$(\),\$(\)"
- data " align 8
+ data " align 4
 \1: memory \2
 \3: memory \4
 "
  data " char \$(\)"
- data " align 8
+ data " align 4
 \1: memory \2
 "
  data " char \$,\$,\$,\$,\$,\$,\$,\$"
- data " align 8
+ data " align 4
 \1: memory 1
 \2: memory 1
 \3: memory 1
@@ -719,7 +719,7 @@ pass1:
 \8: memory 1
 "
  data " char \$,\$,\$,\$,\$,\$,\$"
- data " align 8
+ data " align 4
 \1: memory 1
 \2: memory 1
 \3: memory 1
@@ -729,7 +729,7 @@ pass1:
 \7: memory 1
 "
  data " char \$,\$,\$,\$,\$,\$"
- data " align 8
+ data " align 4
 \1: memory 1
 \2: memory 1
 \3: memory 1
@@ -738,7 +738,7 @@ pass1:
 \6: memory 1
 "
  data " char \$,\$,\$,\$,\$"
- data " align 8
+ data " align 4
 \1: memory 1
 \2: memory 1
 \3: memory 1
@@ -746,86 +746,86 @@ pass1:
 \5: memory 1
 "
  data " char \$,\$,\$,\$"
- data " align 8
+ data " align 4
 \1: memory 1
 \2: memory 1
 \3: memory 1
 \4: memory 1
 "
  data " char \$,\$,\$"
- data " align 8
+ data " align 4
 \1: memory 1
 \2: memory 1
 \3: memory 1
 "
  data " char \$,\$"
- data " align 8
+ data " align 4
 \1: memory 1
 \2: memory 1
 "
  data " char \$"
- data " align 8
+ data " align 4
 \1: memory 1
 "
  data " count \#,\#,\#,\#,\#,\#,\#,\#"
- data " align 8
-\1: memory 32
-\2: memory 32
-\3: memory 32
-\4: memory 32
-\5: memory 32
-\6: memory 32
-\7: memory 32
-\8: memory 32
+ data " align 4
+\1: memory 16
+\2: memory 16
+\3: memory 16
+\4: memory 16
+\5: memory 16
+\6: memory 16
+\7: memory 16
+\8: memory 16
 "
  data " count \#,\#,\#,\#,\#,\#,\#"
- data " align 8
-\1: memory 32
-\2: memory 32
-\3: memory 32
-\4: memory 32
-\5: memory 32
-\6: memory 32
-\7: memory 32
+ data " align 4
+\1: memory 16
+\2: memory 16
+\3: memory 16
+\4: memory 16
+\5: memory 16
+\6: memory 16
+\7: memory 16
 "
  data " count \#,\#,\#,\#,\#,\#"
- data " align 8
-\1: memory 32
-\2: memory 32
-\3: memory 32
-\4: memory 32
-\5: memory 32
-\6: memory 32
+ data " align 4
+\1: memory 16
+\2: memory 16
+\3: memory 16
+\4: memory 16
+\5: memory 16
+\6: memory 16
 "
  data " count \#,\#,\#,\#,\#"
- data " align 8
-\1: memory 32
-\2: memory 32
-\3: memory 32
-\4: memory 32
-\5: memory 32
+ data " align 4
+\1: memory 16
+\2: memory 16
+\3: memory 16
+\4: memory 16
+\5: memory 16
 "
  data " count \#,\#,\#,\#"
- data " align 8
-\1: memory 32
-\2: memory 32
-\3: memory 32
-\4: memory 32
+ data " align 4
+\1: memory 16
+\2: memory 16
+\3: memory 16
+\4: memory 16
 "
  data " count \#,\#,\#"
- data " align 8
-\1: memory 32
-\2: memory 32
-\3: memory 32
+ data " align 4
+\1: memory 16
+\2: memory 16
+\3: memory 16
 "
  data " count \#,\#"
- data " align 8
-\1: memory 32
-\2: memory 32
+ data " align 4
+\1: memory 16
+\2: memory 16
 "
  data " count \#"
- data " align 8
-\1: memory 32
+ data " align 4
+\1: memory 16
 "
  data NULL
 
@@ -1020,31 +1020,31 @@ pass3:
  data " \2,
  \1#=
  \3,
- \1+8#=
+ \1+4#=
  \4,
- \1+16#=
- 11(rip),
- \1+24#=
+ \1+8#=
+ 12(pc),
+ \1+12#=
 "
  data " for \#=\ to \"
  data " \2,
  \1#=
  \3,
- \1+8#=
+ \1+4#=
  1,
- \1+16#=
- 11(rip),
- \1+24#=
+ \1+8#=
+ 12(pc),
+ \1+12#=
 "
  data " next \#"
  data " \1#,
- \1+8#,
- jz $+118
+ \1+4#,
+ jz $+160
  \1#,
- \1+16#,
+ \1+8#,
  +
  \1#=
- \1+24#,
+ \1+12#,
  jmp@
 "
  data " data \,\,\,\,\,\,\,\"
