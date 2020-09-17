@@ -8,40 +8,39 @@ main:
    const ELF_MEM_SIZE 17
    const ELF_FILE_SIZE 18
  
- char    buf$(256),xbuf$(256),infile$(FILE_SIZE),outfile$(FILE_SIZE)
- long    in_fname#,out_fname#,start_adrs#,blist#,prev_loc#
+ char    buf$(256),xbuf$(256),in_fname$(256),out_fname$(256)
+ char    infile$(FILE_SIZE),outfile$(FILE_SIZE)
+ long    start_adrs#,blist#,prev_loc#
  count  i#,j#,nn#
  long    cmnt1#,cmnt2#,pc#,ofset#
  long    image_size#
 
  // ファイル名・オプション設定
- NULL,  in_fname#= out_fname#=
+ NULL,  in_fname$= out_fname$=
  0x8054, start_adrs#=
  0, blist#=
  if (argc)#<2 then " command input error", prints nl end
  (argc)#, 1, - nn#=
  for i#=1 to nn#
    (argv)#(i#), buf, strcpy
-   buf, xbuf, strcpy
 
    // リストオプションの設定
-   NULL, buf+5$=
    buf, "-list", strcmp j#=
    if j#=0 then  1, blist#= gotoset_fname1
 
    // スタートアドレスの設定
-   NULL, buf+4$=
-   buf, "-p0x", strcmp j#=
-   if j#=0 then  xbuf+4, 16, atoi start_adrs#= gotoset_fname1
+   buf, "-p0x", 4, strncmp j#=
+   if j#=0 then  buf+4, 16, atoi start_adrs#= gotoset_fname1
 
    // ファイルネームの設定
-   if in_fname#=NULL then argv-8#(i#), in_fname#= gotoset_fname1
-   argv-8#(i#), out_fname#= 
+   if in_fname$=NULL then buf, in_fname, strcpy gotoset_fname1
+   buf, out_fname, strcpy 
+
    set_fname1:
  next i#
 
- if in_fname#=NULL then " command input error", prints nl end
- if out_fname#=NULL then "a.efi", out_fname#=
+ if in_fname$=NULL then " command input error", prints nl end
+ if out_fname$=NULL then "a.out", out_fname, strcpy
 
  // 各パラメータを読み込む
  paramater, restore
@@ -59,7 +58,7 @@ main:
  // pass1: ラベルの定義
  1, pass#= 0, line#=
  start_adrs#, location#=
- in_fname#, infile,  ropen j#=
+ in_fname, infile,  ropen j#=
  if j#=ERROR then "file not found", prints nl end
  loop_pass1:
   buf, infile, finputs j#=
@@ -90,8 +89,8 @@ main:
  // pass2: コードの生成
  2, pass#= 0, line#=
  start_adrs#, location#=
- in_fname#,   infile,   ropen
- out_fname#, outfile, wopen
+ in_fname,   infile,   ropen
+ out_fname, outfile, wopen
 
  // ヘッダを出力
  for i#=1 to HEADER_SIZE
@@ -118,6 +117,7 @@ main:
      if blist#=0 goto case_MEMORY
      address#, hex prints ":", prints
      for i#=1 to wordlen#
+       if ins-1$(i#)<16 then "0", prints
        ins-1$(i#),  hex prints " ", prints
      next i#
      for i#=wordlen# to MAX_WORD
@@ -169,7 +169,7 @@ asm_1line:
  const ALIGN      4
  const EQU_PP   5
  const LABEL      0
- const MAX_WORD 64
+ const MAX_WORD 12
  const END      -1
 
  count k#
@@ -177,19 +177,21 @@ asm_1line:
  long  location#,ins_type#,wordlen#,address#,line#,pass#
  long  lbl#,stt#,ref#,sou#,start_adr#,end_adr#,last_equ#
 
+ buf, lbl#= stt#=
  line#, 1, + line#=
  location#, address#=
   0, wordlen#=  
  -1, ins_type#=
 
 // コメントを除去する 
- buf, cmnt1, strstr k#=
+ buf, cmnt1#, strstr k#=
  if k#<>NULL then NULL, (k)$=
- buf, cmnt2, strstr k#=
+ buf, cmnt2#, strstr k#=
  if k#<>NULL then NULL, (k)$=
 
 // 不要なスペースを除去する
  buf, strlen buf, + k#=
+
  del_space:
   if k#=buf goto normal_end
   k#, 1, - k#=
@@ -198,7 +200,6 @@ asm_1line:
 
 // ラベルを分離する
 ext_label:
- buf, lbl#= stt#=
  loop1:
   if  (stt)$=':'   goto exit1
   if  (stt)$=SPACE goto exit1
@@ -207,6 +208,7 @@ ext_label:
   goto loop1
  exit1:
  NULL, (stt)$=
+
 
 // ステートメントを分離する
 ext_statement:
@@ -467,6 +469,9 @@ lbl_serch:
 // シンボルの検索
 symbl_serch:
  symbl_type$= swap symbl_name#=
+
+// "symbol serch:", prints nl
+
  symbl_p#, LEN_SYMBOL, - y#=
  for x#=0 to y# step LEN_SYMBOL
   if symbol+TYPE$(x#)<>symbl_type$  goto not_match
@@ -474,6 +479,10 @@ symbl_serch:
    if z#=0 then 1, ex$= symbol+VALUE#(x#), end
   not_match:
  next x#
+ 
+// "symbol serch: none", prints nl
+
+ 
  NULL, ex$=
  end
 
@@ -485,14 +494,14 @@ symbl_serch:
 header:
  data 0x464c457f,0x00010101,0x00000000,0x00000000 
  data 0x00280002,0x00000001,0x00008054,0x00000034 
- data 0x00000160,0x05000000,0x00200034,0x00280001 
- data 0x00030006,0x00000001,0x00000000,0x00008000 
- data 0x00008000,0x00000110,0x00000110,0x00000005 
- data 0x00008000
+ data 0x00000000,0x05000002,0x00200034,0x00000001 
+ data 0x00000000,0x00000001,0x00000000,0x00008000 
+ data 0x00008000,0x00000110,0x00000110,0x00000007 
+ data 0x00001000
  
 // アセンブラデータ
 paramater:
-  data "/*","//","$",-8
+  data "/*","//","$",-4
 
 // レジスタの定義データ
 symbols:
@@ -564,240 +573,240 @@ def_ins:
  data 0,0,0,0
  data 32,0
  data END
- data "\\1704=\\1704+\\1704",NORMAL,4
+ data "\1704=\1704+\1704",NORMAL,4
  data 0x00,0x00,0x80,0xe0
  data 4,12,4,16,4,0
  data END
- data "\\1704=\\1704-\\1704",NORMAL,4
+ data "\1704=\1704-\1704",NORMAL,4
  data 0x00,0x00,0x40,0xe0
  data 4,12,4,16,4,0
  data END
- data "\\1704=\\1704&\\1704",NORMAL,4
+ data "\1704=\1704&\1704",NORMAL,4
  data 0x00,0x00,0x00,0xe0
  data 4,12,4,16,4,0
  data END
- data "\\1704=\\1704|\\1704",NORMAL,4
+ data "\1704=\1704|\1704",NORMAL,4
  data 0x00,0x00,0x80,0xe1
  data 4,12,4,16,4,0
  data END
- data "\\1704=\\1704^\\1704",NORMAL,4
- data 0x00,9x00,0x20,0xe0
+ data "\1704=\1704^\1704",NORMAL,4
+ data 0x00,0x00,0x20,0xe0
  data  4,12,4,16,4,0
  data END
- data "\\1704=\\1704<<\\1704",NORMAL,4
+ data "\1704=\1704<<\1704",NORMAL,4
  data 0x10,0x00,0xa0,0xe1
  data 4,12,4,0,4,8
  data END
- data "\\1704=\\1704>>\\1704",NORMAL,4
+ data "\1704=\1704>>\1704",NORMAL,4
  data 0x30,0x00,0xa0,0xe1
  data 4,12,4,0,4,8
  data END
- data "\\1704=\\1704*\\1704",NORMAL,4
+ data "\1704=\1704*\1704",NORMAL,4
  data 0x90,0x00,0x00,0xe0
  data 4,16,4,0,4,8
  data END
- data "\\1704-\\1704",NORMAL,4
+ data "\1704-\1704",NORMAL,4
  data 0x00,0x00,0x50,0xe1
  data 4,16,4,0
  data END
- data "\\1704&\\1704",NORMAL,4
+ data "\1704&\1704",NORMAL,4
  data 0x00,0x00,0x10,0xe1
  data 4,16,4,0
  data END
- data "\\1704=\\1704+\\0708",NORMAL,4
+ data "\1704=\1704+\0708",NORMAL,4
  data 0x00,0x00,0x80,0xe2
  data 4,12,4,16,8,0
  data END
- data "\\1704=\\1704-\\0708",NORMAL,4
+ data "\1704=\1704-\0708",NORMAL,4
  data 0x00,0x00,0x40,0xe2
  data 4,12,4,16,8,0
  data END
- data "\\1704=\\1704&\\0708",NORMAL,4
+ data "\1704=\1704&\0708",NORMAL,4
  data 0x00,0x00,0x00,0xe2
  data 4,12,4,16,8,0
  data END
- data "\\1704=\\1704|\\0708",NORMAL,4
+ data "\1704=\1704|\0708",NORMAL,4
  data 0x00,0x00,0x80,0xe3
  data 4,12,4,16,8,0
  data END
- data "\\1704=\\1704^\\0708",NORMAL,4
- data 0x00,0x00,0x20,0xe2
+ data "\1704=\1704^\0708",NORMAL,4
+ data 0x00,0x00,0x20,0xe0
  data 4,12,4,16,8,0
  data END
- data "\\1704=\\1704<<\\0705",NORMAL,4
+ data "\1704=\1704<<\0705",NORMAL,4
  data 0x00,0x00,0xa0,0xe1
  data 4,12,4,0,5,7
  data END
- data "\\1704=\\1704>>\\0705",NORMAL,4
+ data "\1704=\1704>>\0705",NORMAL,4
  data 0x20,0x00,0xa0,0xe1
  data 4,12,4,0,5,7
  data END
- data "\\1704-\\0708",NORMAL,4
+ data "\1704-\0708",NORMAL,4
  data 0x00,0x00,0x50,0xe3
  data 4,16,8,0
  data END
- data "\\1704&\\0708",NORMAL,4
+ data "\1704&\0708",NORMAL,4
  data 0x00,0x00,0x10,0xe3
  data 4,16,8,0
  data END
- data "\\1704=(\\1704+\\1704)#",NORMAL,4
+ data "\1704=(\1704+\1704)#",NORMAL,4
  data 0x00,0x00,0x90,0xe7
  data 4,12,4,16,4,0
  data END
- data "\\1704=(\\1704+\\0708)#",NORMAL,4
+ data "\1704=(\1704+\0708)#",NORMAL,4
  data 0x00,0x00,0x90,0xe5
  data 4,12,4,16,8,0
  data END
- data "\\1704=(\\1704)#",NORMAL,4
+ data "\1704=(\1704)#",NORMAL,4
  data 0x00,0x00,0x90,0xe5
  data 4,12,4,16
  data END
- data "\\1704=(\\1704+\\1704)!",NORMAL,4
+ data "\1704=(\1704+\1704)!",NORMAL,4
  data 0x00,0x00,0x90,0xe7
  data 4,12,4,16,4,0
  data END
- data "\\1704=(\\1704+\\0708)!",NORMAL,4
+ data "\1704=(\1704+\0708)!",NORMAL,4
  data 0x00,0x00,0x90,0xe5
  data 4,12,4,16,8,0
  data END
- data "\\1704=(\\1704)!",NORMAL,4
+ data "\1704=(\1704)!",NORMAL,4
  data 0x00,0x00,0x90,0xe5
  data 4,12,4,16
  data END
- data "\\1704=(\\1704+\\1704)%",NORMAL,4
+ data "\1704=(\1704+\1704)%",NORMAL,4
  data 0x00,0x00,0x90,0xe1
  data 4,12,4,16,4,0
  data END
- data "\\1704=(\\1704+\\0708)%",NORMAL,4
+ data "\1704=(\1704+\0708)%",NORMAL,4
  data 0x00,0x00,0xd0,0xe1
  data 4,12,4,16,8,0
  data END
- data "\\1704=(\\1704)%",NORMAL,4
+ data "\1704=(\1704)%",NORMAL,4
  data 0x00,0x00,0xd0,0xe1
  data 4,12,4,16
  data END
- data "\\1704=(\\1704+\\1704)$",NORMAL,4
+ data "\1704=(\1704+\1704)$",NORMAL,4
  data 0x00,0x00,0xd0,0xe7
  data 4,12,4,16,4,0
  data END
- data "\\1704=(\\1704+\\0708)$",NORMAL,4
+ data "\1704=(\1704+\0708)$",NORMAL,4
  data 0x00,0x00,0xd0,0xe5
  data 4,12,4,16,8,0
  data END
- data "\\1704=(\\1704)$",NORMAL,4
+ data "\1704=(\1704)$",NORMAL,4
  data 0x00,0x00,0xd0,0xe5
  data 4,12,4,16
  data END
- data "(\\1704+\\1704)#=\\1704",NORMAL,4
+ data "(\1704+\1704)#=\1704",NORMAL,4
  data 0x00,0x00,0x80,0xe7
  data 4,16,4,0,4,12
  data END
- data "(\\1704+\\0708)#=\\1704",NORMAL,4
+ data "(\1704+\0708)#=\1704",NORMAL,4
  data 0x00,0x00,0x80,0xe5
  data 4,16,8,0,4,12
  data END
- data "(\\1704)#=\\1704",NORMAL,4
+ data "(\1704)#=\1704",NORMAL,4
  data 0x00,0x00,0x80,0xe5
  data 4,16,4,12
  data END
- data "(\\1704+\\1704)!=\\1704",NORMAL,4
+ data "(\1704+\1704)!=\1704",NORMAL,4
  data 0x00,0x00,0x80,0xe7
  data 4,16,4,0,4,12
  data END
- data "(\\1704+\\0708)!=\\1704",NORMAL,4
+ data "(\1704+\0708)!=\1704",NORMAL,4
  data 0x00,0x00,0x80,0xe5
  data 4,16,8,0,4,12
  data END
- data "(\\1704)!=\\1704",NORMAL,4
+ data "(\1704)!=\1704",NORMAL,4
  data 0x00,0x00,0x80,0xe5
  data 4,16,4,12
  data END
- data "(\\1704+\\1704)%=\\1704",NORMAL,4
+ data "(\1704+\1704)%=\1704",NORMAL,4
  data 0x00,0x00,0x80,0xe1
  data 4,16,4,0,4,12
  data END
- data "(\\1704+\\0708)%=\\1704",NORMAL,4
+ data "(\1704+\0708)%=\1704",NORMAL,4
  data 0x00,0x00,0xc0,0xe1
  data 4,16,8,0,4,12
  data END
- data "(\\1704)%=\\1704",NORMAL,4
+ data "(\1704)%=\1704",NORMAL,4
  data 0x00,0x00,0xc0,0xe1
  data 4,16,4,12
  data END
- data "(\\1704+\\1704)$=\\1704",NORMAL,4
+ data "(\1704+\1704)$=\1704",NORMAL,4
  data 0x00,0x00,0xc0,0xe7
  data 4,16,4,0,4,12
  data END
- data "(\\1704+\\0708)$=\\1704",NORMAL,4
+ data "(\1704+\0708)$=\1704",NORMAL,4
  data 0x00,0x00,0xc0,0xe5
  data 4,16,8,0,4,12
  data END
- data "(\\1704)$=\\1704",NORMAL,4
+ data "(\1704)$=\1704",NORMAL,4
  data 0x00,0x00,0xc0,0xe5
  data 4,16,4,12
  data END
- data "\\1704=\\1704",NORMAL,4
+ data "\1704=\1704",NORMAL,4
  data 0x00,0x00,0xa0,0xe1
  data 4,12,4,0
  data END
- data "\\1704=&\\0632",NORMAL,12
+ data "\1704=&\0632",NORMAL,12
  data 0x00,0x00,0x9f,0xe5
  data 0x00,0x00,0x00,0xea
  data 0x00,0x00,0x00,0x00
  data 4,12,32,64
  data END
- data "\\1704=\\0708",NORMAL,4
+ data "\1704=\0708",NORMAL,4
  data 0x00,0x00,0xa0,0xe3
  data 4,12,8,0
  data END
- data "jmp \\0426",NORMAL,4
+ data "jmp \0426",NORMAL,4
  data 0x00,0x00,0x00,0xea
  data 2,120,24,0
  data END
- data "jeq \\0426",NORMAL,4
+ data "jeq \0426",NORMAL,4
  data 0x00,0x00,0x00,0x0a
  data 2,120,24,0
  data END
- data "jne \\0426",NORMAL,4
+ data "jne \0426",NORMAL,4
  data 0x00,0x00,0x00,0x1a
  data 2,120,24,0
  data END
- data "jpl \\0426",NORMAL,4
+ data "jpl \0426",NORMAL,4
  data 0x00,0x00,0x00,0x5a
  data 2,120,24,0
  data END
- data "jmi \\0426",NORMAL,4
+ data "jmi \0426",NORMAL,4
  data 0x00,0x00,0x00,0x4a
  data 2,120,24,0
  data END
- data "jge \\0426",NORMAL,4
+ data "jge \0426",NORMAL,4
  data 0x00,0x00,0x00,0xaa
  data 2,120,24,0
  data END
- data "jgt \\0426",NORMAL,4
+ data "jgt \0426",NORMAL,4
  data 0x00,0x00,0x00,0xca
  data 2,120,24,0
  data END
- data "jlt \\0426",NORMAL,4
+ data "jlt \0426",NORMAL,4
  data 0x00,0x00,0x00,0xba
  data 2,120,24,0
  data END
- data "jle \\0426",NORMAL,4
+ data "jle \0426",NORMAL,4
  data 0x00,0x00,0x00,0xda
  data 2,120,24,0
  data END
- data "call \\0426",NORMAL,4
+ data "call \0426",NORMAL,4
  data 0x00,0x00,0x00,0xeb
  data 2,120,24,0
  data END
  data "ret",NORMAL,4
  data 0x0e,0xf0,0xa0,0xe1
  data END
- data "clz \\1704,\\1704",NORMAL,4
+ data "clz \1704,\1704",NORMAL,4
  data 0x10,0x0f,0x6f,0xe1
  data 4,12,4,0
  data END
- data "svc \\0724",NORMAL,4
+ data "svc \0724",NORMAL,4
  data 0x00,0x00,0x00,0xef
  data 24,0
  data END

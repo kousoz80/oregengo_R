@@ -18,10 +18,10 @@
  char  __sign$(1),__nbuf$(64)
  count __p0#
  long   __p1#,__p2#,__p3#,__p4#,__p5#,__p6#,__p7#
- long __t#,read_p# // data文へのポインタ
+ long __t#,__u#,read_p# // data文へのポインタ
  long  __stack#(STACK_SIZE)
  long  __stack_top#
- long  argc#,argv#
+ long  argc#,argv#,stdin#,stdout#,stderr#
 
 /* プログラム開始位置 */
 _start:
@@ -33,6 +33,7 @@ _start:
 / (r2)#=r0/
 / sp=&__stack_top/
 
+ 0, stdin#= 1, stdout#= 2, stderr#=
  main
 
 / r0=0/
@@ -47,11 +48,11 @@ idiv:
 / (sp)#=r8/
 / r9=0/
 / r0-r9/
-/ jlt idiv1/
+/ jge idiv1/
 / r0=r9-r0/
 idiv1:
 / r1-r9/
-/ jlt idiv2/
+/ jge idiv2/
 / r1=r9-r1/
 idiv2:
  udiv
@@ -115,12 +116,15 @@ getchar:
 getc:
   __t#=
   0, __fbuf$=
-  1, __fbuf, __t#, _read
+  1, __fbuf, __t#, _read __u#=
+  if __u#=0 then EOF, return
+  if __u#=ERROR then EOF, return
   __fbuf$, return
 
 
 /* ファイルから読み込む( size, buf, hFile, _read ) */
 _read:
+/ r0=(r0)#/
 / r7=3/
 / svc 0/
   end
@@ -128,7 +132,7 @@ _read:
 
 /* コンソールへ一文字出力する */
 putchar:
- 1,
+ stdout,
 
 
 /* ファイルへ一文字書き込む */
@@ -141,6 +145,7 @@ putc:
 
 /* ファイルへ書き込む( size, buf, hFile, _write ) */
 _write:
+/ r0=(r0)#/
 / r7=4/
 / svc 0/
   end
@@ -148,6 +153,8 @@ _write:
 
 // 書き込みモードでファイルを開く
 wopen:
+/ r8=r0/
+/ r0=r1/
 / r1=&577/
 / r2=&511/
 / jmp open/
@@ -155,25 +162,30 @@ wopen:
 
 // 読み出しモードでファイルを開く
 ropen:
+/ r8=r0/
+/ r0=r1/
 / r1=0/
 
 
 // ファイルを開く
 open:
 / sp=sp-4/
-/ (sp)#=r0/
+/ (sp)#=r8/
 / r7=5/
 / svc 0/
 / r8=(sp)#/
 / sp=sp+4/
 / (r8)#=r0/
-  end
+  __t#=
+  if __t#<0 then ERROR, end
+  __t#, end
  
  
 /* ファイルを閉じる */
 wclose:
 rclose:
 close:
+/ r0=(r0)#/
 / r7=6/
 / svc 0/
   end
@@ -188,7 +200,7 @@ delete:
 
 /* 文字列を表示する */
 prints:
- 1,
+ stdout,
 
 
 /* 文字列をファイルへ出力する */
@@ -204,7 +216,7 @@ fprints:
 
 /* 数値を表示する */
 printd:
- 1,
+ stdout,
 
 
 /* 数値をファイルに出力する */
@@ -215,7 +227,7 @@ fprintd:
 
 /* 改行する */
 nl:
- 1,
+ stdout,
 
 
 /* 改行コードをファイルに出力する */
@@ -227,7 +239,7 @@ fnl:
 
 /* コンソールから文字列を入力する */
 inputs:
- 0,
+ stdin,
 
 
 /* ファイルから文字列を入力する */
@@ -277,6 +289,19 @@ strcpy:
   __p1#, 1, + __p1#=
   __p2#, 1, + __p2#=
  if __p3#<>NULL goto __strcpy1
+ end
+
+
+// 文字数制限付きで文字列をコピーする
+strncpy:
+ __p3#= pop __p2#= pop __p1#=
+ __strncpy1:
+  if __p3#<=0 then NULL, (__p2)$= end
+  (__p1)$, (__p2)$= __p4#=
+  __p1#++
+  __p2#++
+  __p3#--
+ if __p4#<>NULL goto __strncpy1
  end
 
 
