@@ -1,0 +1,15 @@
+#!/bin/sh
+# "test.r"をコンパイルしてディレクトリ"apps"にuefiアプリケーションファイルをコピーします
+
+if [ $# != 1 ]; then
+ echo "使用法: ./compile_uefi file　(.rはつけない)"
+ exit 1
+fi
+./orc uefi.rh $1.r
+java -jar asm_x64.jar -efi asm.s apps/$1.EFI
+objdump -fsxdt apps/$1.EFI> apps/test.txt
+rm __tmp1
+rm __tmp2
+rm __str
+rm __var
+rm asm.s

@@ -1,5 +1,0 @@
-# "test.r"をコンパイルしてディレクトリ"apps"にuefiアプリケーションファイルをコピーします
-
-orc uefi.rh test.r
-java -jar asm_x64.jar -efi asm.s apps/test.EFI
-objdump -fsxdt apps/test.EFI> apps/test.txt

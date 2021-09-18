@@ -98,14 +98,14 @@ udiv_zero:
 / r0=&NaN/
   end
 
-// 除算の余り
-mod:
- udiv swap end
-
 // アンダーフロー(演算結果は0)
 udiv_under:
 / r0=0/
  end
+
+// 除算の余り
+mod:
+ udiv swap end
 
 /* コンソールからから一文字読み込む */
 getchar:

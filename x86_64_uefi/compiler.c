@@ -5,12 +5,13 @@
   "compiler.c" 
 
     oregengo_R
-    独自言語コンパイラ ver 1.3
+    独自言語コンパイラ ver 1.3.1(UEFI特化タイプ)
    (struct/class構文対応版)
    今回の変更点: struct/class構文のfield文を追加
    
   asm_x64形式のアセンブラソースファイルを生成
   ソースファイル名は "asm.s"となる
+  コンパイル方法： gcc -o orc compiler.c
 
 */
 
