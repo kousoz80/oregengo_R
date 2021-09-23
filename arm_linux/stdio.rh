@@ -15,7 +15,7 @@
  const SIZEOF_CHAR 1
  const SIZEOF_SHORT 2
  const SIZEOF_INT 4
- const SIZEOF_LONG 8
+ const SIZEOF_LONG 4
  
 
  /* 作業変数 */
