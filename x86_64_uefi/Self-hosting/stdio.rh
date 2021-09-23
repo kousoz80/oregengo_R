@@ -244,6 +244,10 @@
  const vector_ap1  0x000000000041d548
  const xcolor  0x000000000041d708
  const _end  0x00000000004258b0
+ const SIZEOF_LONG 8
+ const SIZEOF_INT 4
+ const SIZEOF_SHORT 2
+ const SIZEOF_CHAR 1
 // "stdio.base" the base text of "stdio.rh"
 
 __xxmain1:

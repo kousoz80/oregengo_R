@@ -12,6 +12,11 @@
  const NaN      0x80000000  /* ゼロ除算が発生したことをあらわす */
  const STACK_SIZE 8000
  const FILE_SIZE 16
+ const SIZEOF_CHAR 1
+ const SIZEOF_SHORT 2
+ const SIZEOF_INT 4
+ const SIZEOF_LONG 8
+ 
 
  /* 作業変数 */
  char  __fbuf$(512)  /* ファイル読み書き用のバッファ */

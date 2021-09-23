@@ -389,28 +389,28 @@ void compile_s(){
       else if( strncmp( s, "long ", 5 ) == 0 ){
         for( s += 5; *s == ' ' || *s == '\t'; s++ ) {}    // 空白を読み飛ばす
         if( ( t = strstr( s, "#" ) ) != NULL ) *t = '\0';
-        fprintf( hOutFile, " const_plus %s.%s 8\n", sname, s );
+        fprintf( hOutFile, " const_plus %s.%s SIZEOF_LONG\n", sname, s );
       }
 
       // int型
       else  if( strncmp( s, "int ", 4 ) == 0 ){
         for( s += 4; *s == ' ' || *s == '\t'; s++ ) {}    // 空白を読み飛ばす
         if( ( t = strstr( s, "!" ) ) != NULL ) *t = '\0';
-        fprintf( hOutFile, " const_plus %s.%s 4\n", sname, s );
+        fprintf( hOutFile, " const_plus %s.%s SIZEOF_INT\n", sname, s );
       }
 
       // short型
       else   if( strncmp( s, "short ", 6 ) == 0 ){
         for( s += 6; *s == ' ' || *s == '\t'; s++ ) {}    // 空白を読み飛ばす
         if( ( t = strstr( s, "%" ) ) != NULL ) *t = '\0';
-        fprintf( hOutFile, " const_plus %s.%s 2\n", sname, s );
+        fprintf( hOutFile, " const_plus %s.%s SIZEOF_SHORT\n", sname, s );
       }
 
       // char型
       else  if( strncmp( s, "char ", 5 ) == 0 ){
         for( s += 5; *s == ' ' || *s == '\t'; s++ ) {}    // 空白を読み飛ばす
         if( ( t = strstr( s, "$" ) ) != NULL ) *t = '\0';
-        fprintf( hOutFile, " const_plus %s.%s 1\n", sname, s );
+        fprintf( hOutFile, " const_plus %s.%s SIZEOF_CHAR\n", sname, s );
       }
 
       // 終了

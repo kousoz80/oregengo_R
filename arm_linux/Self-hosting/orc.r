@@ -221,7 +221,7 @@ compile_s:
         if p#<>NULL then NULL, (p)$=
         " const_plus ", wfp, fprints  sname, wfp, fprints
         ".",  wfp, fprints s#, wfp, fprints
-        " 8", wfp, fprints wfp, fnl
+        " SIZEOF_LONG", wfp, fprints wfp, fnl
         goto cmp_loop
         
         // int文が検出された場合
@@ -235,7 +235,7 @@ compile_s:
         if p#<>NULL then NULL, (p)$=
         " const_plus ", wfp, fprints  sname, wfp, fprints
         ".",  wfp, fprints s#, wfp, fprints
-        " 4", wfp, fprints wfp, fnl
+        " SIZEOF_INT", wfp, fprints wfp, fnl
         goto cmp_loop
         
         // short文が検出された場合
@@ -249,7 +249,7 @@ compile_s:
         if p#<>NULL then NULL, (p)$=
         " const_plus ", wfp, fprints  sname, wfp, fprints
         ".",  wfp, fprints s#, wfp, fprints
-        " 2", wfp, fprints wfp, fnl
+        " SIZEOF_SHORT", wfp, fprints wfp, fnl
         goto cmp_loop
         
         // char文が検出された場合
@@ -263,7 +263,7 @@ compile_s:
         if p#<>NULL then NULL, (p)$=
         " const_plus ", wfp, fprints  sname, wfp, fprints
         ".",  wfp, fprints s#, wfp, fprints
-        " 1", wfp, fprints wfp, fnl
+        " SIZEOF_CHAR", wfp, fprints wfp, fnl
         goto cmp_loop
         
         // end文が検出された場合

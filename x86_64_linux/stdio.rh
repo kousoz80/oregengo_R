@@ -10,6 +10,10 @@
  const MINUS    45          /* マイナス記号の文字コード */
  const ESC      27          /* ESCキーの文字コード */
  const NaN      0x8000000000000000  /* ゼロ除算が発生したことをあらわす */
+ const SIZEOF_CHAR 1
+ const SIZEOF_SHORT 2
+ const SIZEOF_INT 4
+ const SIZEOF_LONG 8
 
  /* 作業変数 */
  char  __fbuf$(512)  /* ファイル読み書き用のバッファ */
